@@ -8,6 +8,7 @@ import (
 	"GopherAI/model"
 	"GopherAI/utils"
 	"GopherAI/utils/myjwt"
+	"log"
 )
 
 func Login(username, password string) (string, code.Code) {
@@ -38,11 +39,13 @@ func Register(email, password, captcha string) (string, code.Code) {
 
 	//1:先判断用户是否已经存在了
 	if ok, _ := user.IsExistUser(email); ok {
+		log.Println("user.IsExistUser failed")
 		return "", code.CodeUserExist
 	}
 
 	//2:从redis中验证验证码是否有效
 	if ok, _ := myredis.CheckCaptchaForEmail(email, captcha); !ok {
+		log.Println("myredis.CheckCaptchaForEmail failed")
 		return "", code.CodeInvalidCaptcha
 	}
 
@@ -51,11 +54,13 @@ func Register(email, password, captcha string) (string, code.Code) {
 
 	//4：注册到数据库中
 	if userInformation, ok = user.Register(username, email, password); !ok {
+		log.Println("user.Register failed")
 		return "", code.CodeServerBusy
 	}
 
 	//5：将账号一并发送到对应邮箱上去，后续需要账号登录
 	if err := myemail.SendCaptcha(email, username, user.UserNameMsg); err != nil {
+		log.Println("myemail.SendCaptcha failed")
 		return "", code.CodeServerBusy
 	}
 
@@ -63,6 +68,7 @@ func Register(email, password, captcha string) (string, code.Code) {
 	token, err := myjwt.GenerateToken(userInformation.ID, userInformation.Username)
 
 	if err != nil {
+		log.Println("myjwt.GenerateToken failed")
 		return "", code.CodeServerBusy
 	}
 

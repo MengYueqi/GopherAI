@@ -4,8 +4,8 @@ host = "0.0.0.0"
 port = 9090
 
 [emailConfig]
-authcode = "your authcode "
-email = "your qq email"
+authcode = "tpzhknloealhbjgf"
+email = "1691129074@qq.com"
 
 [redisConfig]
 host = "127.0.0.1"

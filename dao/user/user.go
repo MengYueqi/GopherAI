@@ -5,6 +5,7 @@ import (
 	"GopherAI/model"
 	"GopherAI/utils"
 	"context"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -35,8 +36,10 @@ func Register(username, email, password string) (*model.User, bool) {
 		Username: username,
 		Password: utils.MD5(password),
 	}); err != nil {
+		log.Println("InsertUser err:", err)
 		return nil, false
 	} else {
+		log.Println("Register success:", user.Username)
 		return user, true
 	}
 }
