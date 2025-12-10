@@ -24,6 +24,7 @@ func InitMysql() error {
 
 	//dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true&loc=Local", username, password, host, port, dbname, charset)
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=true&loc=Local", username, password, host, port, dbname, charset)
+	// fmt.Println(dsn)
 
 	var log logger.Interface
 	if gin.Mode() == "debug" {

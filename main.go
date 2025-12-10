@@ -62,7 +62,10 @@ func main() {
 	readDataFromDB()
 
 	//初始化redis
-	redis.Init()
+	if err := redis.Init(); err != nil {
+		log.Println("InitRedis error , " + err.Error())
+		return
+	}
 	log.Println("redis init success  ")
 	rabbitmq.InitRabbitMQ()
 	log.Println("rabbitmq init success  ")

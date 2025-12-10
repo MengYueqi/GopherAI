@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+
+# Go build artifacts
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Logs and env
+*.log
+*.out
+.env
+
+# Dependency/build directories
+vendor/
+node_modules/
+dist/
+build/
+
+# Coverage
+coverage/
+*.coverprofile
