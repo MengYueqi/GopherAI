@@ -17,6 +17,8 @@ import (
 	"golang.org/x/image/draw"
 )
 
+// TODO: 换成一个基于 qwen 的能力，因为 onnx 在 Mac 上这个库跑不了
+
 type ImageRecognizer struct {
 	session      *ort.Session[float32]
 	inputName    string
@@ -51,6 +53,7 @@ func NewImageRecognizer(modelPath, labelPath string, inputH, inputW int) (*Image
 	if initErr != nil {
 		return nil, fmt.Errorf("onnxruntime initialize error: %w", initErr)
 	}
+	// ort.SetSharedLibraryPath("/opt/homebrew/Cellar/onnxruntime/1.22.2_6/lib/libonnxruntime.1.22.0.dylib")
 
 	// 预先创建输入输出 Tensor
 	inputShape := ort.NewShape(1, 3, int64(inputH), int64(inputW))
@@ -140,11 +143,9 @@ func (r *ImageRecognizer) PredictFromBuffer(buf []byte) (string, error) {
 	return r.PredictFromImage(img)
 }
 
-
 func (r *ImageRecognizer) PredictFromImage(img image.Image) (string, error) {
 
 	resizedImg := image.NewRGBA(image.Rect(0, 0, r.inputW, r.inputH))
-
 
 	draw.CatmullRom.Scale(resizedImg, resizedImg.Bounds(), img, img.Bounds(), draw.Over, nil)
 
@@ -157,7 +158,6 @@ func (r *ImageRecognizer) PredictFromImage(img image.Image) (string, error) {
 			c := resizedImg.At(x, y)
 
 			r, g, b, _ := c.RGBA()
-
 
 			rf := float32(r>>8) / 255.0
 			gf := float32(g>>8) / 255.0
