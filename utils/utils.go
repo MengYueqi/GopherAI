@@ -65,7 +65,6 @@ func of[T any](a T) *T {
 	return &a
 }
 
-// TODO: 目前是基于纯文本的，之后需要带上图片
 // 转换图片请求信息到 schema 格式
 func ConvertToSchemaImageRequests(b64OrDataURL string) []*schema.Message {
 	// msg := []*schema.Message{
