@@ -13,6 +13,7 @@ import (
 	"image/jpeg"
 	_ "image/jpeg"
 	_ "image/png"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,9 +59,8 @@ func (r *ImageRecognizer) PredictFromImage(ctx context.Context, img image.Image)
 
 	// Base64 + data URL
 	b64 := base64.StdEncoding.EncodeToString(buf.Bytes())
-	dataURL := "data:image/jpeg;base64," + b64
 
-	msg := utils.ConvertToSchemaImageRequests(dataURL)
+	msg := utils.ConvertToSchemaImageRequests(b64)
 	om, err := NewOpenAIImageModel(ctx)
 	if err != nil {
 		return "", err
@@ -69,6 +69,7 @@ func (r *ImageRecognizer) PredictFromImage(ctx context.Context, img image.Image)
 	// 4. 调用 OpenAI
 	resp, err := om.GenerateImageDescription(ctx, msg)
 	if err != nil {
+		log.Printf("GenerateImageDescription error: %v", err)
 		return "", err
 	}
 

@@ -61,14 +61,37 @@ func ConvertToSchemaMessages(msgs []*model.Message) []*schema.Message {
 	return schemaMsgs
 }
 
+func of[T any](a T) *T {
+	return &a
+}
+
 // TODO: 目前是基于纯文本的，之后需要带上图片
 // 转换图片请求信息到 schema 格式
 func ConvertToSchemaImageRequests(b64OrDataURL string) []*schema.Message {
-	msg := []*schema.Message{
-		{
-			Role:    "user",
-			Content: "请进行简单的自我介绍",
+	// msg := []*schema.Message{
+	// 	{
+	// 		Role:    "user",
+	// 		Content: "请进行简单的自我介绍",
+	// 	},
+	// }
+	msg := &schema.Message{
+		Role: schema.User,
+		UserInputMultiContent: []schema.MessageInputPart{
+			{
+				Type: schema.ChatMessagePartTypeText,
+				Text: "帮我对照片进行简单描述",
+			},
+			{
+				Type: schema.ChatMessagePartTypeImageURL,
+				Image: &schema.MessageInputImage{
+					MessagePartCommon: schema.MessagePartCommon{
+						Base64Data: &b64OrDataURL,
+						MIMEType:   "image/jpeg",
+					},
+					Detail: schema.ImageURLDetailAuto,
+				},
+			},
 		},
 	}
-	return msg
+	return []*schema.Message{msg}
 }
