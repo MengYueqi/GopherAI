@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 
 	"github.com/cloudwego/eino-ext/components/model/ollama"
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/components/model"
+	"github.com/cloudwego/eino/components/tool"
+	"github.com/cloudwego/eino/components/tool/utils"
 	"github.com/cloudwego/eino/schema"
 )
 
@@ -25,6 +28,38 @@ type AIModel interface {
 // =================== OpenAI 实现 ===================
 type OpenAIModel struct {
 	llm model.ToolCallingChatModel
+}
+
+// NOTE: 测试代码
+func AddTodoFunc(_ context.Context, params string) (string, error) {
+	// Mock处理逻辑
+	return `{"msg": "add todo success"}`, nil
+}
+
+func getAddTodoTool() tool.InvokableTool {
+	// 工具信息
+	info := &schema.ToolInfo{
+		Name: "add_todo",
+		Desc: "Add a todo item",
+		ParamsOneOf: schema.NewParamsOneOfByParams(map[string]*schema.ParameterInfo{
+			"content": {
+				Desc:     "The content of the todo item",
+				Type:     schema.String,
+				Required: true,
+			},
+			"started_at": {
+				Desc: "The started time of the todo item, in unix timestamp",
+				Type: schema.Integer,
+			},
+			"deadline": {
+				Desc: "The deadline of the todo item, in unix timestamp",
+				Type: schema.Integer,
+			},
+		}),
+	}
+
+	// 使用NewTool创建工具
+	return utils.NewTool(info, AddTodoFunc)
 }
 
 func NewOpenAIModel(ctx context.Context) (*OpenAIModel, error) {
@@ -44,7 +79,27 @@ func NewOpenAIModel(ctx context.Context) (*OpenAIModel, error) {
 }
 
 func (o *OpenAIModel) GenerateResponse(ctx context.Context, messages []*schema.Message) (*schema.Message, error) {
-	resp, err := o.llm.Generate(ctx, messages)
+	// TODO: 接入工具，构建 agent
+	todoTools := []tool.BaseTool{
+		getAddTodoTool(),
+	}
+
+	// 获取工具信息并绑定到 ChatModel
+	toolInfos := make([]*schema.ToolInfo, 0, len(todoTools))
+	for _, tool := range todoTools {
+		info, err := tool.Info(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		toolInfos = append(toolInfos, info)
+	}
+
+	// 给模型增加工具
+	llm_new, err := o.llm.WithTools(toolInfos)
+	if err != nil {
+		return nil, fmt.Errorf("openai add tools failed: %v", err)
+	}
+	resp, err := llm_new.Generate(ctx, messages)
 	if err != nil {
 		return nil, fmt.Errorf("openai generate failed: %v", err)
 	}
