@@ -11,9 +11,10 @@ import (
 
 	"github.com/cloudwego/eino-ext/components/model/ollama"
 	"github.com/cloudwego/eino-ext/components/model/openai"
+	"github.com/cloudwego/eino/callbacks"
+	"github.com/cloudwego/eino/components"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/components/tool"
-	"github.com/cloudwego/eino/components/tool/utils"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
 )
@@ -36,32 +37,6 @@ type OpenAIModel struct {
 func AddTodoFunc(_ context.Context, params string) (string, error) {
 	// Mock处理逻辑
 	return `{"msg": "add todo success"}`, nil
-}
-
-func getAddTodoTool() tool.InvokableTool {
-	// 工具信息
-	info := &schema.ToolInfo{
-		Name: "add_todo",
-		Desc: "Add a todo item",
-		ParamsOneOf: schema.NewParamsOneOfByParams(map[string]*schema.ParameterInfo{
-			"content": {
-				Desc:     "The content of the todo item",
-				Type:     schema.String,
-				Required: true,
-			},
-			"started_at": {
-				Desc: "The started time of the todo item, in unix timestamp",
-				Type: schema.Integer,
-			},
-			"deadline": {
-				Desc: "The deadline of the todo item, in unix timestamp",
-				Type: schema.Integer,
-			},
-		}),
-	}
-
-	// 使用NewTool创建工具
-	return utils.NewTool(info, AddTodoFunc)
 }
 
 func NewOpenAIModel(ctx context.Context) (*OpenAIModel, error) {
@@ -114,12 +89,31 @@ func (o *OpenAIModel) GenerateResponse(ctx context.Context, messages []*schema.M
 		log.Fatal(err)
 	}
 
+	// 创建一个回调函数，收集中间消息
+	handler := callbacks.NewHandlerBuilder().
+		OnEndFn(func(ctx context.Context, info *callbacks.RunInfo, output callbacks.CallbackOutput) context.Context {
+			if info != nil && info.Component == components.ComponentOfChatModel {
+				messages = append(messages, output.(*model.CallbackOutput).Message)
+				log.Printf("Appended message from chat model to messages: %v", output.(*model.CallbackOutput).Message)
+			} else if info != nil && info.Component == components.ComponentOfTool {
+				messages = append(messages, &schema.Message{
+					Role:       schema.Tool,
+					ToolCallID: messages[len(messages)-1].ToolCallID,
+					Content:    output.(string),
+				})
+			}
+			return ctx
+		}).
+		Build()
+
+	// 注册全局回调
+	callbacks.AppendGlobalHandlers(handler)
+
 	// 构建完整的处理链
-	chain := compose.NewChain[[]*schema.Message, *schema.Message]()
+	chain := compose.NewChain[[]*schema.Message, []*schema.Message]()
 	chain.
 		AppendChatModel(llm_new, compose.WithNodeName("chat_model")).
 		AppendToolsNode(todoToolsNode, compose.WithNodeName("tools"))
-		// AppendChatModel(llm_new, compose.WithNodeName("chat_model"))
 
 	// 编译并运行 chain
 	agent, err := chain.Compile(ctx)
@@ -127,9 +121,15 @@ func (o *OpenAIModel) GenerateResponse(ctx context.Context, messages []*schema.M
 		log.Fatal(err)
 	}
 
-	resp, err := agent.Invoke(ctx, messages)
+	_, err = agent.Invoke(ctx, messages)
 	if err != nil {
 		return nil, fmt.Errorf("openai generate failed: %v", err)
+	}
+
+	log.Printf("current msg: %v", messages)
+	resp, err := o.llm.Generate(ctx, messages)
+	if err != nil {
+		return nil, fmt.Errorf("openai generate summary failed: %v", err)
 	}
 
 	return resp, nil
