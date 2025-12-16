@@ -5,6 +5,7 @@ import (
 	"GopherAI/common/mysql"
 	"GopherAI/common/rabbitmq"
 	"GopherAI/common/redis"
+	"GopherAI/common/tools"
 	"GopherAI/config"
 	"GopherAI/dao/message"
 	"GopherAI/dao/session"
@@ -37,7 +38,7 @@ func readDataFromDB() error {
 		config := make(map[string]interface{})
 
 		// 创建对应的 AIHelper
-		_, err := manager.GetOrCreateAIHelper(s.UserName, s.ID, modelType, config, s.Title)
+		_, err := manager.GetOrCreateAIHelper(s.UserName, s.ID, modelType, config, aihelper.WithTitle(s.Title), aihelper.WithUpdateAt(s.UpdatedAt))
 		if err != nil {
 			log.Printf("[readDataFromDB] failed to create helper for user=%s session=%s: %v", s.UserName, s.ID, err)
 			continue
@@ -86,6 +87,12 @@ func main() {
 	log.Println("redis init success  ")
 	rabbitmq.InitRabbitMQ()
 	log.Println("rabbitmq init success  ")
+
+	// 初始化 Tools
+	if err := tools.InitTools(); err != nil {
+		log.Println("InitTools error , " + err.Error())
+		return
+	}
 
 	err := StartServer(host, port) // 启动 HTTP 服务
 	if err != nil {

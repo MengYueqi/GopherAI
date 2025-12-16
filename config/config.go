@@ -59,15 +59,29 @@ type OllamaConfig struct {
 	ModelName string `toml:"modelName"`
 }
 
+type GoogleConfig struct {
+	GoogleAPIKey         string `toml:"googleAPIKey"`
+	GoogleSearchEngineID string `toml:"googleSearchEngineID"`
+}
+
+type VikingDBConfig struct {
+	AK         string `toml:"AK"`
+	SK         string `toml:"SK"`
+	Collection string `toml:"collection"`
+	Index      string `toml:"index"`
+}
+
 type Config struct {
-	EmailConfig   `toml:"emailConfig"`
-	RedisConfig   `toml:"redisConfig"`
-	MysqlConfig   `toml:"mysqlConfig"`
-	JwtConfig     `toml:"jwtConfig"`
-	MainConfig    `toml:"mainConfig"`
-	Rabbitmq      `toml:"rabbitmqConfig"`
-	ImageAIConfig `toml:"imageAIConfig"`
-	OllamaConfig  `toml:"ollamaConfig"`
+	EmailConfig    `toml:"emailConfig"`
+	RedisConfig    `toml:"redisConfig"`
+	MysqlConfig    `toml:"mysqlConfig"`
+	JwtConfig      `toml:"jwtConfig"`
+	MainConfig     `toml:"mainConfig"`
+	Rabbitmq       `toml:"rabbitmqConfig"`
+	ImageAIConfig  `toml:"imageAIConfig"`
+	OllamaConfig   `toml:"ollamaConfig"`
+	GoogleConfig   `toml:"googleConfig"`
+	VikingDBConfig `toml:"vikingDBConfig"`
 }
 
 type RedisKeyConfig struct {

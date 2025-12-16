@@ -15,6 +15,7 @@
         >
           <div class="session-name">{{ session.name || `会话 ${session.id}` }}</div>
           <div class="session-model" v-if="session.modelType">模型：{{ session.modelType }}</div>
+          <div class="session-updated" v-if="session.updateAt">更新：{{ formatUpdateTime(session.updateAt) }}</div>
         </li>
       </ul>
     </div>
@@ -22,17 +23,43 @@
     <!-- 右侧聊天区域 -->
     <div class="chat-section">
       <div class="top-bar">
-        <button class="back-btn" @click="$router.push('/menu')">← 返回</button>
-        <button class="sync-btn" @click="syncHistory" :disabled="!currentSessionId || tempSession">同步历史数据</button>
-        <label for="modelType">选择模型：</label>
-        <select id="modelType" v-model="selectedModel" class="model-select">
-          <option value="1">openai</option>
-          <option value="2">ollama</option>
-        </select>
-        <label for="streamingMode" style="margin-left: 20px;">
-          <input type="checkbox" id="streamingMode" v-model="isStreaming" />
-          流式响应
-        </label>
+        <div class="top-actions">
+          <button class="back-btn" @click="$router.push('/menu')">← 返回</button>
+          <button class="sync-btn" @click="syncHistory" :disabled="!currentSessionId || tempSession">同步历史数据</button>
+        </div>
+        <div class="top-controls">
+          <div class="select-group">
+            <label for="modelType">选择模型</label>
+            <select id="modelType" v-model="selectedModel" class="model-select">
+              <option value="1">openai</option>
+              <option value="2">ollama</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            class="chip-toggle"
+            :class="{ active: isStreaming }"
+            @click="isStreaming = !isStreaming"
+          >
+            <span class="chip-indicator google"></span>
+            <span class="chip-text">
+              <strong>流式响应</strong>
+              <small>实时输出</small>
+            </span>
+          </button>
+          <button
+            type="button"
+            class="chip-toggle"
+            :class="{ active: isUsingGoogle }"
+            @click="isUsingGoogle = !isUsingGoogle"
+          >
+            <span class="chip-indicator"></span>
+            <span class="chip-text">
+              <strong>使用 Google</strong>
+              <small>{{ isUsingGoogle ? '已启用' : '未启用' }}</small>
+            </span>
+          </button>
+        </div>
       </div>
 
       <div class="chat-messages" ref="messagesRef">
@@ -46,7 +73,15 @@
             <button v-if="message.role === 'assistant'" class="tts-btn" @click="playTTS(message.content)">🔊</button>
             <span v-if="message.meta && message.meta.status === 'streaming'" class="streaming-indicator"> ··</span>
           </div>
-          <div class="message-content" v-html="renderMarkdown(message.content)"></div>
+          <div class="message-content">
+            <MdPreview
+              v-if="message.role === 'assistant'"
+              :modelValue="message.content"
+              previewTheme="github"
+              :showCodeRowNumber="false"
+            />
+            <div v-else class="user-plain-text">{{ message.content }}</div>
+          </div>
         </div>
       </div>
 
@@ -76,14 +111,16 @@
 </template>
 
 <script>
-
-
 import { ref, nextTick, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { MdPreview } from 'md-editor-v3'
 import api from '../utils/api'
 
 export default {
   name: 'AIChat',
+  components: {
+    MdPreview
+  },
   setup() {
 
     const sessions = ref({})               
@@ -96,6 +133,7 @@ export default {
     const messageInput = ref(null)
     const selectedModel = ref('1')
     const isStreaming = ref(false)
+    const isUsingGoogle = ref(false)
 
     const modelValueToLabel = (value) => {
       const normalized = String(value ?? '').toLowerCase()
@@ -112,15 +150,27 @@ export default {
       return String(label)
     }
 
-
-    const renderMarkdown = (text) => {
-      if (!text && text !== '') return ''
-      return String(text)
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`(.*?)`/g, '<code>$1</code>')
-        .replace(/\n/g, '<br>')
+    const parseTimestamp = (value) => {
+      if (!value) return 0
+      const time = new Date(value).getTime()
+      return Number.isNaN(time) ? 0 : time
     }
+
+    const formatUpdateTime = (value) => {
+      if (!value) return ''
+      const date = new Date(value)
+      if (Number.isNaN(date.getTime())) return value
+      const pad = (num) => String(num).padStart(2, '0')
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+    }
+
+    const touchSessionTimestamp = (sessionId, timestamp) => {
+      if (!sessionId) return
+      const sid = String(sessionId)
+      if (!sessions.value[sid]) return
+      sessions.value[sid].updateAt = timestamp || new Date().toISOString()
+    }
+
 
     const playTTS = async (text) => {
       try {
@@ -148,6 +198,7 @@ export default {
               id: sid,
               name: s.name || `会话 ${sid}`,
               modelType: s.modelType || '',
+              updateAt: s.updateAt || s.updatedAt || '',
               messages: [] // lazy load
             }
           })
@@ -190,6 +241,7 @@ export default {
               content: item.content
             }))
             sessions.value[normalizedId].messages = messages
+            sessions.value[normalizedId].updateAt = response.data.updateAt || new Date().toISOString()
           }
         } catch (err) {
           console.error('Load history error:', err)
@@ -215,6 +267,7 @@ export default {
             content: item.content
           }))
           sessions.value[currentSessionId.value].messages = messages
+          sessions.value[currentSessionId.value].updateAt = response.data.updateAt || new Date().toISOString()
           currentMessages.value = [...messages]
           await nextTick()
           scrollToBottom()
@@ -307,8 +360,13 @@ export default {
       }
 
       const body = tempSession.value
-        ? { question: question, modelType: selectedModel.value }
-        : { question: question, modelType: selectedModel.value, sessionId: currentSessionId.value }
+        ? { question: question, modelType: selectedModel.value, usingGoogle: isUsingGoogle.value }
+        : {
+            question: question,
+            modelType: selectedModel.value,
+            sessionId: currentSessionId.value,
+            usingGoogle: isUsingGoogle.value
+          }
 
       try {
         // 创建 fetch 连接读取 SSE 流
@@ -367,6 +425,7 @@ export default {
                         id: newSid,
                         name: '新会话',
                         modelType: parsed.modelType || modelValueToLabel(selectedModel.value),
+                        updateAt: parsed.updateAt || new Date().toISOString(),
                         messages: [...currentMessages.value]
                       }
                       currentSessionId.value = newSid
@@ -404,6 +463,7 @@ export default {
         loading.value = false
         currentMessages.value[aiMessageIndex].meta = { status: 'done' }
         currentMessages.value = [...currentMessages.value]
+        touchSessionTimestamp(currentSessionId.value)
 
         // 同步到 sessions 存储
         if (!tempSession.value && currentSessionId.value && sessions.value[currentSessionId.value]) {
@@ -430,7 +490,8 @@ export default {
 
         const response = await api.post('/AI/chat/send-new-session', {
           question: question,
-          modelType: selectedModel.value
+          modelType: selectedModel.value,
+          usingGoogle: isUsingGoogle.value
         })
         if (response.data && response.data.status_code === 1000) {
           const sessionId = String(response.data.sessionId)
@@ -443,6 +504,7 @@ export default {
             id: sessionId,
             name: '新会话',
             modelType: response.data.modelType || modelValueToLabel(selectedModel.value),
+            updateAt: response.data.updateAt || new Date().toISOString(),
             messages: [ { role: 'user', content: question }, aiMessage ]
           }
           currentSessionId.value = sessionId
@@ -462,12 +524,14 @@ export default {
         const response = await api.post('/AI/chat/send', {
           question: question,
           modelType: selectedModel.value,
-          sessionId: currentSessionId.value
+          sessionId: currentSessionId.value,
+          usingGoogle: isUsingGoogle.value
         })
         if (response.data && response.data.status_code === 1000) {
           const aiMessage = { role: 'assistant', content: response.data.Information || '' }
           sessionMsgs.push(aiMessage)
           currentMessages.value = [...sessionMsgs]
+          touchSessionTimestamp(currentSessionId.value, response.data.updateAt || new Date().toISOString())
         } else {
           ElMessage.error(response.data?.status_msg || '发送失败')
           sessionMsgs.pop() // rollback
@@ -495,7 +559,10 @@ export default {
 
     // expose to template
     return {
-      sessions: computed(() => Object.values(sessions.value)),
+      sessions: computed(() => {
+        const list = Object.values(sessions.value)
+        return list.sort((a, b) => parseTimestamp(b.updateAt) - parseTimestamp(a.updateAt))
+      }),
       currentSessionId,
       tempSession,
       currentMessages,
@@ -505,8 +572,9 @@ export default {
       messageInput,
       selectedModel,
       isStreaming,
+      isUsingGoogle,
       canInteract,
-      renderMarkdown,
+      formatUpdateTime,
       playTTS,
       createNewSession,
       switchSession,
@@ -521,44 +589,50 @@ export default {
 .ai-chat-container {
   height: 100vh;
   display: flex;
-  background: #f8f9fa;
-  color: #202124;
-  font-family: 'Google Sans', 'Roboto', sans-serif;
+  gap: 24px;
+  padding: 32px;
+  background: radial-gradient(circle at top, #f6f8ff 0%, #eef1fb 45%, #e4e7f1 100%);
+  color: #1f2333;
+  font-family: 'Google Sans', 'Roboto', 'PingFang SC', sans-serif;
+  box-sizing: border-box;
 }
 
 .session-list {
   width: 280px;
-  border-right: 1px solid rgba(60, 64, 67, 0.12);
-  background: #fff;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 20px 45px rgba(71, 78, 114, 0.15);
+  backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
-  height: 100%;
   overflow: hidden;
 }
 
 .session-list-header {
-  padding: 24px;
-  border-bottom: 1px solid rgba(60, 64, 67, 0.12);
+  padding: 28px 24px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   font-weight: 600;
 }
 
 .new-chat-btn {
   width: 100%;
   padding: 12px 0;
-  border-radius: 20px;
-  border: 1px solid rgba(60, 64, 67, 0.16);
-  background: #fff;
-  color: #1a73e8;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(120deg, #5f7afe, #7b8bff);
+  color: #fff;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 24px rgba(95, 122, 254, 0.3);
 }
 
 .new-chat-btn:hover {
-  background: rgba(26, 115, 232, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 30px rgba(95, 122, 254, 0.35);
 }
 
 .session-list-ul {
@@ -570,31 +644,38 @@ export default {
 }
 
 .session-item {
-  padding: 14px 24px;
+  padding: 16px 24px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(60, 64, 67, 0.08);
-  color: #3c4043;
-  transition: background 0.2s ease;
+  color: #3b415b;
+  transition: background 0.2s ease, color 0.2s ease;
+  border-left: 4px solid transparent;
 }
 
 .session-name {
   font-weight: 600;
+  font-size: 15px;
 }
 
 .session-model {
   font-size: 12px;
-  color: #5f6368;
+  color: #7a809c;
+  margin-top: 6px;
+}
+
+.session-updated {
   margin-top: 4px;
+  font-size: 11px;
+  color: #9ca2c4;
 }
 
 .session-item.active {
-  background: rgba(26, 115, 232, 0.1);
-  color: #1a73e8;
-  font-weight: 600;
+  background: rgba(95, 122, 254, 0.12);
+  color: #3d4ef7;
+  border-left-color: #5f7afe;
 }
 
 .session-item:hover {
-  background: rgba(26, 115, 232, 0.08);
+  background: rgba(95, 122, 254, 0.08);
 }
 
 .chat-section {
@@ -602,58 +683,153 @@ export default {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: #f8f9fa;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 25px 50px rgba(24, 32, 79, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
 }
 
 .top-bar {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid rgba(99, 110, 146, 0.08);
+}
+
+.top-actions {
+  display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 24px;
-  border-bottom: 1px solid rgba(60, 64, 67, 0.12);
-  background: #fff;
+}
+
+.top-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #7d849f;
+}
+
+.select-group label {
+  font-weight: 600;
+}
+
+.chip-toggle {
+  border: none;
+  border-radius: 20px;
+  padding: 10px 14px;
+  background: rgba(91, 101, 138, 0.08);
+  color: #4c5170;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  min-width: 140px;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.chip-toggle .chip-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(76, 81, 112, 0.4);
+  position: relative;
+  box-shadow: inset 0 0 0 2px rgba(76, 81, 112, 0.3);
+}
+.chip-toggle .chip-indicator.google {
+  width: 12px;
+  height: 12px;
+  background: #c3c6d9;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.chip-toggle .chip-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.chip-toggle strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chip-toggle small {
+  font-size: 11px;
+  color: #7b80a0;
+}
+
+.chip-toggle.active {
+  background: rgba(95, 122, 254, 0.15);
+  box-shadow: 0 10px 18px rgba(95, 122, 254, 0.2);
+  transform: translateY(-1px);
+}
+
+.chip-toggle.active .chip-indicator {
+  background: linear-gradient(135deg, #5f7afe, #7bb0ff);
+  box-shadow: 0 0 8px rgba(95, 122, 254, 0.7);
+}
+
+.chip-toggle.active .chip-indicator.google {
+  background: linear-gradient(135deg, #34a853, #fbbc04, #4285f4);
+}
+
+.chip-toggle.active .chip-text small {
+  color: #5260d6;
 }
 
 .back-btn,
 .sync-btn {
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(60, 64, 67, 0.16);
-  background: #fff;
-  color: #1a73e8;
+  padding: 10px 18px;
+  border-radius: 18px;
+  border: none;
+  background: rgba(93, 108, 231, 0.12);
+  color: #3d4ef7;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sync-btn {
   color: #fff;
-  background: #1a73e8;
-  border-color: #1a73e8;
+  background: linear-gradient(120deg, #3d4ef7, #6a6ff9);
+  box-shadow: 0 12px 24px rgba(61, 78, 247, 0.35);
 }
 
 .sync-btn:disabled {
-  background: #dadce0;
-  border-color: #dadce0;
+  background: #cdd2f1;
   color: #fff;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
 .model-select {
-  border-radius: 999px;
-  border: 1px solid rgba(60, 64, 67, 0.16);
+  border-radius: 14px;
+  border: 1px solid rgba(99, 110, 146, 0.25);
   padding: 6px 12px;
   background: #fff;
-  color: #202124;
+  color: #232742;
+  font-weight: 600;
+  outline: none;
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 32px;
+  padding: 36px 40px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
+  background: linear-gradient(180deg, rgba(248, 249, 255, 0.9), rgba(240, 243, 255, 0.6));
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -661,62 +837,90 @@ export default {
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-  background: rgba(60, 64, 67, 0.2);
+  background: rgba(99, 110, 146, 0.3);
   border-radius: 3px;
 }
 
 .message {
-  max-width: 640px;
-  padding: 16px 20px;
-  border-radius: 18px;
+  max-width: 700px;
+  padding: 18px 22px;
+  border-radius: 20px;
   line-height: 1.6;
   font-size: 15px;
-  box-shadow: 0 8px 20px rgba(60, 64, 67, 0.08);
-  background: #fff;
+  box-shadow: 0 16px 35px rgba(46, 57, 107, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(5px);
 }
 
 .user-message {
   align-self: flex-end;
-  background: #1a73e8;
+  background: linear-gradient(135deg, #4d7cfe, #6ac2ff);
   color: #fff;
 }
 
 .ai-message {
   align-self: flex-start;
-  background: #fff;
-  color: #202124;
+  background: rgba(255, 255, 255, 0.95);
+  color: #202437;
 }
 
 .message-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(32, 36, 55, 0.7);
+}
+
+.message-header b {
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .message-content {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.message-content :deep(.md-editor-preview) {
+  background: transparent;
+  padding: 0;
+}
+
+.message-content :deep(pre) {
+  background: #101736;
+  color: #f4f4ff;
+  border-radius: 14px;
+  padding: 14px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-plain-text {
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .streaming-indicator {
-  color: #5f6368;
+  color: #1ac0ff;
   font-weight: 600;
 }
 
 .tts-btn {
   border: none;
   border-radius: 12px;
-  background: rgba(26, 115, 232, 0.1);
-  color: #1a73e8;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
   padding: 4px 10px;
   cursor: pointer;
 }
 
 .chat-input {
-  padding: 24px;
-  border-top: 1px solid rgba(60, 64, 67, 0.12);
-  background: #fff;
+  padding: 24px 32px 32px;
+  background: transparent;
   display: flex;
   gap: 16px;
   align-items: flex-end;
@@ -725,58 +929,76 @@ export default {
 
 .chat-input textarea {
   flex: 1;
-  border-radius: 16px;
-  border: 1px solid rgba(60, 64, 67, 0.24);
-  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(108, 121, 170, 0.35);
+  padding: 16px 18px;
   resize: none;
-  min-height: 48px;
+  min-height: 54px;
   max-height: 180px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 2px 8px rgba(23, 32, 90, 0.08);
 }
 
 .chat-input textarea:focus {
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+  border-color: #5f7afe;
+  box-shadow: 0 0 0 3px rgba(95, 122, 254, 0.25);
   outline: none;
 }
 
 .send-btn {
-  border-radius: 999px;
+  border-radius: 16px;
   border: none;
-  padding: 12px 28px;
-  background: #1a73e8;
+  padding: 14px 32px;
+  background: linear-gradient(120deg, #5f7afe, #7bb0ff);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 15px 30px rgba(87, 116, 255, 0.35);
 }
 
 .send-btn:disabled {
-  background: #dadce0;
+  background: #cdd2f1;
+  box-shadow: none;
   cursor: not-allowed;
+}
+
+.send-btn:not(:disabled):hover {
+  transform: translateY(-2px);
 }
 
 .chat-input-hint {
   position: absolute;
-  top: 8px;
-  left: 24px;
+  top: 6px;
+  left: 40px;
   color: #ea4335;
   font-size: 13px;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .ai-chat-container {
     flex-direction: column;
+    height: auto;
   }
 
   .session-list {
     width: 100%;
-    height: 220px;
-    border-right: none;
-    border-bottom: 1px solid rgba(60, 64, 67, 0.12);
+    flex-direction: column;
   }
 
   .chat-section {
-    height: calc(100vh - 220px);
+    width: 100%;
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .top-controls {
+    width: 100%;
+    flex-wrap: wrap;
   }
 }
 </style>

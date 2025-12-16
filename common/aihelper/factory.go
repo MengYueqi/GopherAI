@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 
 // ModelCreator 定义模型创建函数类型（需要 context）
@@ -61,13 +62,13 @@ func (f *AIModelFactory) CreateAIModel(ctx context.Context, modelType string, co
 }
 
 // CreateAIHelper 一键创建 AIHelper
-func (f *AIModelFactory) CreateAIHelper(ctx context.Context, modelType string, SessionID string, config map[string]interface{}, title string) (*AIHelper, error) {
+func (f *AIModelFactory) CreateAIHelper(ctx context.Context, modelType string, SessionID string, config map[string]interface{}, title string, UpdateAt time.Time) (*AIHelper, error) {
 	log.Printf("Creating AIHelper with modelType: %s, SessionID: %s", modelType, SessionID)
 	model, err := f.CreateAIModel(ctx, modelType, config)
 	if err != nil {
 		return nil, err
 	}
-	return NewAIHelper(model, SessionID, title), nil
+	return NewAIHelper(model, SessionID, title, UpdateAt), nil
 }
 
 // RegisterModel 可扩展注册
