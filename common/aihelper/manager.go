@@ -4,6 +4,7 @@ import (
 	"GopherAI/model"
 	"context"
 	"sync"
+	"time"
 )
 
 var ctx = context.Background()
@@ -21,16 +22,49 @@ func NewAIHelperManager() *AIHelperManager {
 	}
 }
 
+// 辅助参数
+type CreateAIHelperParams struct {
+	Title    string
+	UpdateAt time.Time
+}
+
+// 获取默认辅助参数
+func defaultCreateAIHelperParams() *CreateAIHelperParams {
+	return &CreateAIHelperParams{
+		Title:    "",
+		UpdateAt: time.Now(),
+	}
+}
+
+type CreateAIHelperOption func(*CreateAIHelperParams)
+
+func WithTitle(title string) CreateAIHelperOption {
+	return func(p *CreateAIHelperParams) {
+		p.Title = title
+	}
+}
+
+func WithUpdateAt(t time.Time) CreateAIHelperOption {
+	return func(p *CreateAIHelperParams) {
+		p.UpdateAt = t
+	}
+}
+
 func (m *AIHelperManager) GetOrCreateAIHelper(
 	userName string,
 	sessionID string,
 	modelType string,
 	config map[string]interface{},
-	titleOpt ...string, // 可选参数
+	opts ...CreateAIHelperOption,
 ) (*AIHelper, error) {
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	p := defaultCreateAIHelperParams()
+	for _, opt := range opts {
+		opt(p)
+	}
 
 	// 获取用户的会话映射
 	userHelpers, exists := m.helpers[userName]
@@ -45,15 +79,9 @@ func (m *AIHelperManager) GetOrCreateAIHelper(
 		return helper, nil
 	}
 
-	// 解析可选 title
-	title := ""
-	if len(titleOpt) > 0 {
-		title = titleOpt[0]
-	}
-
 	// 创建新的 AIHelper
 	factory := GetGlobalFactory()
-	helper, err := factory.CreateAIHelper(ctx, modelType, sessionID, config, title)
+	helper, err := factory.CreateAIHelper(ctx, modelType, sessionID, config, p.Title, p.UpdateAt)
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +138,7 @@ func (m *AIHelperManager) GetUserSessions(userName string) []model.SessionInfo {
 			SessionID: sessionID,
 			Title:     helper.Title,
 			ModelType: helper.model.GetModelType(),
+			UpdateAt:  helper.GetLastUpdatedAt(),
 		})
 	}
 

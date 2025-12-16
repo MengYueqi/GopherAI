@@ -6,6 +6,7 @@ import (
 	"GopherAI/utils"
 	"context"
 	"sync"
+	"time"
 
 	"github.com/cloudwego/eino/schema"
 )
@@ -18,11 +19,12 @@ type AIHelper struct {
 	//一个会话绑定一个AIHelper
 	SessionID string
 	Title     string
+	UpdateAt  time.Time
 	saveFunc  func(*model.Message) (*model.Message, error)
 }
 
 // NewAIHelper 创建新的AIHelper实例
-func NewAIHelper(model_ AIModel, SessionID string, title string) *AIHelper {
+func NewAIHelper(model_ AIModel, SessionID string, title string, UpdateAt time.Time) *AIHelper {
 	return &AIHelper{
 		model:    model_,
 		messages: make([]*model.Message, 0),
@@ -34,6 +36,7 @@ func NewAIHelper(model_ AIModel, SessionID string, title string) *AIHelper {
 		},
 		SessionID: SessionID,
 		Title:     title,
+		UpdateAt:  UpdateAt,
 	}
 }
 
@@ -130,4 +133,9 @@ func (a *AIHelper) StreamResponse(userName string, ctx context.Context, cb Strea
 // GetModelType 获取模型类型
 func (a *AIHelper) GetModelType() string {
 	return a.model.GetModelType()
+}
+
+// GetLastUpdatedAt 获取最后更新时间
+func (a *AIHelper) GetLastUpdatedAt() time.Time {
+	return a.UpdateAt
 }

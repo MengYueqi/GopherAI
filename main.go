@@ -38,7 +38,7 @@ func readDataFromDB() error {
 		config := make(map[string]interface{})
 
 		// 创建对应的 AIHelper
-		_, err := manager.GetOrCreateAIHelper(s.UserName, s.ID, modelType, config, s.Title)
+		_, err := manager.GetOrCreateAIHelper(s.UserName, s.ID, modelType, config, aihelper.WithTitle(s.Title), aihelper.WithUpdateAt(s.UpdatedAt))
 		if err != nil {
 			log.Printf("[readDataFromDB] failed to create helper for user=%s session=%s: %v", s.UserName, s.ID, err)
 			continue
