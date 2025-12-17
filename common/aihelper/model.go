@@ -115,6 +115,46 @@ func (o *OpenAIModel) GenerateResponseWithRAG(ctx context.Context, messages []*s
 	if err != nil {
 		return nil, fmt.Errorf("get RAG tool failed: %v", err)
 	}
+
+	// 使用 RAG 工具查找资料
+	query := messages[len(messages)-1].Content
+	docs, err := ragTool.Retrieve(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("RAG tool retrieve failed: %v", err)
+	}
+
+	// 将检索到的资料添加到消息中
+	for _, doc := range docs {
+		messages = append(messages, &schema.Message{
+			Role:    schema.Assistant,
+			Content: fmt.Sprintf("参考资料：%s", doc.Content),
+		})
+	}
+
+	// 使用增强后的消息生成回复
+	resp, err := o.llm.Generate(ctx, messages)
+	if err != nil {
+		return nil, fmt.Errorf("openai generate with RAG failed: %v", err)
+	}
+
+	// TODO: 修改成
+	// ## Answer
+	// ……根据指南，优先选择 A 方案。[^1] 如果出现 B 情况，则改用 C。[^2]
+
+	// ## References
+	// [^1]: **Doc 1 — Knowledge**
+	// > 原文摘录：……（建议控制在 1–3 段）
+
+	// [^2]: **Doc 2 — Knowledge**
+	// > 原文摘录：……
+	var references strings.Builder
+	references.WriteString("## 参考资料 ##\n")
+	for i, doc := range docs {
+		references.WriteString(fmt.Sprintf("**Doc %d — Knowledge**\n >原文摘录: %s\n\n", i+1, doc.Content))
+	}
+	resp.Content += "\n" + references.String()
+
+	return resp, nil
 }
 
 func (o *OpenAIModel) GenerateResponseWithGoogle(ctx context.Context, messages []*schema.Message) (*schema.Message, error) {
