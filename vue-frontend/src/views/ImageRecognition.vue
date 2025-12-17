@@ -1,22 +1,35 @@
 <template>
   <div class="image-recognition-container">
-    <!-- 左侧会话列表 -->
-    <div class="session-list">
-      <div class="session-list-header">
-        <span>图像识别</span>
-      </div>
-      <ul class="session-list-ul">
-        <li class="session-item active">
-          图像识别助手
+    <aside class="vision-sidebar glass-panel">
+      <span class="pill">Vision Lab</span>
+      <h1>图像识别助手</h1>
+      <p>
+        重新绘制的界面为图像识别打造更沉浸的体验。拖拽或点击上传即可完成解析，
+        历史记录与 AI 回复都保留在右侧的实时流中。
+      </p>
+      <ul class="vision-highlights">
+        <li>
+          <strong>全格式支持</strong>
+          <span>PNG / JPG / WebP / HEIC 等主流格式。</span>
+        </li>
+        <li>
+          <strong>安全上传</strong>
+          <span>仅当前会话可访问的临时 URL。</span>
+        </li>
+        <li>
+          <strong>实时结果</strong>
+          <span>识别成功后立即推送到消息流。</span>
         </li>
       </ul>
-    </div>
+    </aside>
 
-    <!-- 右侧聊天区域 -->
-    <div class="chat-section">
+    <section class="vision-console glass-panel">
       <div class="top-bar">
-        <button class="back-btn" @click="$router.push('/menu')">← 返回</button>
-        <h2>AI 图像识别助手</h2>
+        <div>
+          <h2>识别时间轴</h2>
+          <p>每次识别都会记录在此，方便快速对比。</p>
+        </div>
+        <button class="back-btn" @click="$router.push('/menu')">回到菜单</button>
       </div>
 
       <div class="chat-messages" ref="chatContainerRef">
@@ -37,17 +50,29 @@
 
       <div class="chat-input">
         <form @submit.prevent="handleSubmit">
-          <input
-            ref="fileInputRef"
-            type="file"
-            accept="image/*"
-            required
-            @change="handleFileSelect"
-          />
-          <button type="submit" :disabled="!selectedFile">发送图片</button>
+          <label class="upload-drop" for="vision-upload">
+            <input
+              id="vision-upload"
+              ref="fileInputRef"
+              type="file"
+              accept="image/*"
+              required
+              @change="handleFileSelect"
+            />
+            <div class="drop-icon">＋</div>
+            <div>
+              <strong>拖拽或点击上传</strong>
+              <p>最大 10MB，图片仅用于当前识别</p>
+            </div>
+            <span class="file-name" v-if="selectedFile">{{ selectedFile.name }}</span>
+          </label>
+          <div class="upload-actions">
+            <span>支持批量识别，请逐张上传以确保准确率。</span>
+            <button type="submit" :disabled="!selectedFile">发送图片</button>
+          </div>
         </form>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -148,84 +173,103 @@ export default {
 
 <style scoped>
 .image-recognition-container {
-  height: 100vh;
-  display: flex;
-  background: #f8f9fa;
-  color: #202124;
-  font-family: 'Google Sans', 'Roboto', sans-serif;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) 1fr;
+  gap: 32px;
+  padding: 48px 5vw 64px;
 }
 
-.session-list {
-  width: 280px;
-  border-right: 1px solid rgba(60, 64, 67, 0.12);
-  background: #fff;
+.vision-sidebar {
+  padding: 48px;
+  color: #fff;
+  background: linear-gradient(160deg, rgba(14, 23, 63, 0.95), rgba(49, 63, 166, 0.9));
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
-.session-list-header {
-  padding: 24px;
-  border-bottom: 1px solid rgba(60, 64, 67, 0.12);
-  font-weight: 600;
+.vision-sidebar h1 {
+  margin: 0;
+  font-size: 36px;
 }
 
-.session-list-ul {
+.vision-sidebar p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.vision-highlights {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 8px 0 0;
+  display: grid;
+  gap: 18px;
 }
 
-.session-item {
-  padding: 16px 24px;
-  color: #3c4043;
-  border-bottom: 1px solid rgba(60, 64, 67, 0.08);
+.vision-highlights li {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 18px;
 }
 
-.session-item.active {
-  color: #1a73e8;
-  font-weight: 600;
-  background: rgba(26, 115, 232, 0.08);
+.vision-highlights strong {
+  display: block;
+  margin-bottom: 6px;
 }
 
-.chat-section {
-  flex: 1;
+.vision-highlights span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+}
+
+.vision-console {
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(99, 102, 241, 0.08);
+  box-shadow: 0 35px 80px rgba(15, 23, 42, 0.15);
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
 }
 
 .top-bar {
+  padding: 32px 40px 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 18px 28px;
-  border-bottom: 1px solid rgba(60, 64, 67, 0.12);
-  background: #fff;
-}
-
-.back-btn {
-  border: 1px solid rgba(60, 64, 67, 0.16);
-  border-radius: 999px;
-  padding: 8px 16px;
-  background: #fff;
-  color: #1a73e8;
-  font-weight: 600;
-  cursor: pointer;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .top-bar h2 {
   margin: 0;
-  font-size: 22px;
-  color: #202124;
+  font-size: 26px;
+}
+
+.top-bar p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+}
+
+.back-btn {
+  border: none;
+  border-radius: 18px;
+  padding: 12px 24px;
+  background: linear-gradient(120deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 15px 30px rgba(112, 100, 255, 0.3);
 }
 
 .chat-messages {
   flex: 1;
-  padding: 32px;
+  padding: 32px 40px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
   overflow-y: auto;
+  background: linear-gradient(180deg, rgba(248, 249, 255, 0.8), rgba(235, 240, 255, 0.6));
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -233,28 +277,24 @@ export default {
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-  background: rgba(60, 64, 67, 0.2);
-  border-radius: 3px;
+  background: rgba(15, 23, 42, 0.2);
+  border-radius: 20px;
 }
 
 .message {
-  max-width: 640px;
-  padding: 16px 20px;
-  border-radius: 18px;
+  max-width: 680px;
+  padding: 18px 22px;
+  border-radius: 20px;
   line-height: 1.6;
-  box-shadow: 0 8px 20px rgba(60, 64, 67, 0.08);
-  background: #fff;
+  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .user-message {
   align-self: flex-end;
-  background: #1a73e8;
+  background: linear-gradient(135deg, #6366f1, #3bbef3);
   color: #fff;
-}
-
-.ai-message {
-  align-self: flex-start;
-  color: #202124;
 }
 
 .message-content {
@@ -262,66 +302,119 @@ export default {
 }
 
 .message-content img {
-  max-width: 280px;
-  border-radius: 16px;
-  margin-top: 12px;
-  box-shadow: 0 8px 24px rgba(32, 33, 36, 0.18);
+  max-width: 320px;
+  border-radius: 18px;
+  margin-top: 14px;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.25);
 }
 
 .chat-input {
-  padding: 24px 28px;
-  border-top: 1px solid rgba(60, 64, 67, 0.12);
-  background: #fff;
+  padding: 28px 40px 36px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .chat-input form {
   display: flex;
+  flex-direction: column;
   gap: 16px;
+}
+
+.upload-drop {
+  border: 2px dashed rgba(15, 23, 42, 0.15);
+  border-radius: 24px;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
   align-items: center;
-}
-
-.chat-input input[type='file'] {
-  flex: 1;
-  border: 1px dashed rgba(60, 64, 67, 0.3);
-  border-radius: 16px;
-  padding: 12px 16px;
-  background: #f8f9fa;
   cursor: pointer;
+  background: rgba(248, 249, 255, 0.8);
 }
 
-.chat-input input[type='file']::file-selector-button {
-  border: none;
-  border-radius: 999px;
-  padding: 8px 16px;
-  background: #1a73e8;
-  color: #fff;
-  cursor: pointer;
+.upload-drop:hover {
+  border-color: rgba(112, 100, 255, 0.6);
 }
 
-.chat-input button {
+.upload-drop input {
+  display: none;
+}
+
+.drop-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(112, 100, 255, 0.1);
+  color: var(--primary-dark);
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.upload-drop strong {
+  display: block;
+  font-size: 18px;
+}
+
+.upload-drop p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.file-name {
+  font-size: 14px;
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.upload-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.upload-actions button {
   border: none;
-  border-radius: 999px;
-  padding: 12px 24px;
-  background: #1a73e8;
+  border-radius: 18px;
+  padding: 12px 28px;
+  background: linear-gradient(120deg, var(--primary), var(--secondary));
   color: #fff;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 15px 28px rgba(112, 100, 255, 0.3);
 }
 
-.chat-input button:disabled {
-  background: #dadce0;
+.upload-actions button:disabled {
+  background: #cbd5f5;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
 @media (max-width: 960px) {
   .image-recognition-container {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
-  .session-list {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid rgba(60, 64, 67, 0.12);
+  .vision-sidebar {
+    padding: 36px 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .upload-drop {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .upload-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

@@ -1,82 +1,103 @@
 <template>
-  <div class="register-container">
-    <el-card class="register-card">
-      <template #header>
-        <div class="card-header">
-          <h2>注册</h2>
+  <div class="auth-page register-page">
+    <span class="blob blob-one"></span>
+    <span class="blob blob-two"></span>
+
+    <div class="auth-grid">
+      <section class="auth-hero glass-panel">
+        <span class="pill">Create Workspace</span>
+        <h1>立即启用你的 AI 工作室</h1>
+        <p>
+          激活邮箱即可完成注册。我们通过验证码确认身份，确保数据更安全。
+          完成注册后，即可在统一的控制面板中管理聊天、图像识别与私有知识库。
+        </p>
+        <div class="register-steps">
+          <div class="step">
+            <span>01</span>
+            <strong>验证邮箱</strong>
+          </div>
+          <div class="step">
+            <span>02</span>
+            <strong>设置安全密码</strong>
+          </div>
+          <div class="step">
+            <span>03</span>
+            <strong>绑定你的工作区</strong>
+          </div>
         </div>
-      </template>
-      <el-form
-        ref="registerFormRef"
-        :model="registerForm"
-        :rules="registerRules"
-        label-width="80px"
-      >
-        <el-form-item label="邮箱" prop="email">
-          <el-input
-            v-model="registerForm.email"
-            placeholder="请输入邮箱"
-            type="email"
-          />
-        </el-form-item>
-        <el-form-item label="验证码" prop="captcha">
-          <el-row :gutter="10">
-            <el-col :span="16">
+      </section>
+
+      <el-card class="auth-card glass-panel" shadow="never">
+        <div class="card-header">
+          <h2>注册全新账号</h2>
+          <p>精准的字段校验与验证码防护，确保流程可信。</p>
+        </div>
+        <el-form
+          ref="registerFormRef"
+          :model="registerForm"
+          :rules="registerRules"
+          label-position="top"
+          class="register-form"
+        >
+          <el-form-item label="邮箱" prop="email">
+            <el-input
+              v-model="registerForm.email"
+              placeholder="请输入邮箱"
+              type="email"
+            />
+          </el-form-item>
+          <el-form-item label="验证码" prop="captcha" class="captcha-item">
+            <div class="code-row">
               <el-input
                 v-model="registerForm.captcha"
                 placeholder="请输入验证码"
               />
-            </el-col>
-            <el-col :span="8">
               <el-button
                 type="primary"
                 :loading="codeLoading"
                 :disabled="countdown > 0"
                 @click="sendCode"
-                style="width: 100%"
               >
                 {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
               </el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="registerForm.password"
-            placeholder="请输入密码"
-            type="password"
-            show-password
-          />
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input
-            v-model="registerForm.confirmPassword"
-            placeholder="请再次输入密码"
-            type="password"
-            show-password
-          />
-        </el-form-item>
-        <el-form-item>
+            </div>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input
+              v-model="registerForm.password"
+              placeholder="请输入密码"
+              type="password"
+              show-password
+            />
+          </el-form-item>
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input
+              v-model="registerForm.confirmPassword"
+              placeholder="请再次输入密码"
+              type="password"
+              show-password
+            />
+          </el-form-item>
+          <div class="form-meta">
+            <span>密码需至少 6 位，支持字母数字组合。</span>
+          </div>
           <el-button
             type="primary"
             :loading="loading"
             @click="handleRegister"
-            style="width: 100%"
+            class="submit-btn"
           >
             注册
           </el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="text"
-            @click="$router.push('/login')"
-            style="width: 100%"
-          >
-            已有账号？去登录
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+          <div class="form-footer">
+            <span>已有账号？</span>
+            <button type="button" class="link-btn" @click="$router.push('/login')">
+              去登录
+            </button>
+          </div>
+        </el-form>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -189,83 +210,205 @@ export default {
       sendCode,
       handleRegister
     }
-  }
+}
 }
 </script>
 
 <style scoped>
-.register-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.auth-page {
   min-height: 100vh;
-  background: radial-gradient(circle at top, #e8f0fe 0%, #f8f9fa 60%, #ffffff 100%);
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 5vw;
+  position: relative;
+  overflow: hidden;
 }
 
-.register-card {
-  width: 460px;
-  border-radius: 24px;
-  border: 1px solid rgba(60, 64, 67, 0.12);
-  box-shadow: 0 24px 60px rgba(60, 64, 67, 0.15);
-  background: #fff;
-  padding-bottom: 8px;
+.blob {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.4;
+}
+
+.blob-one {
+  top: -40px;
+  left: 10%;
+  background: #c084fc;
+}
+
+.blob-two {
+  bottom: -40px;
+  right: 12%;
+  background: #34d399;
+}
+
+.auth-grid {
+  width: min(1180px, 100%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-hero {
+  padding: 48px;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(12, 15, 40, 0.95), rgba(48, 56, 126, 0.95));
+}
+
+.auth-hero h1 {
+  font-size: 34px;
+  margin: 20px 0 14px;
+  line-height: 1.2;
+}
+
+.auth-hero p {
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 30px;
+}
+
+.register-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.step {
+  flex: 1;
+  min-width: 140px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.step span {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+.step strong {
+  display: block;
+  font-size: 16px;
+}
+
+.auth-card {
+  padding: 36px 32px 32px;
 }
 
 .card-header {
-  text-align: center;
-  padding: 24px 0 8px 0;
+  margin-bottom: 28px;
 }
 
 .card-header h2 {
   margin: 0;
   font-size: 28px;
-  font-weight: 600;
-  color: #202124;
+  font-weight: 700;
 }
 
-.el-form {
-  padding: 0 12px 16px;
+.card-header p {
+  margin: 8px 0 0;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .el-form-item {
-  margin-bottom: 20px;
+  margin-bottom: 0;
+}
+
+.el-form-item :deep(.el-form-item__label) {
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .el-input :deep(.el-input__wrapper) {
-  box-shadow: none !important;
-  border-radius: 14px;
-  border: 1px solid rgba(60, 64, 67, 0.16);
-  padding: 0 12px;
-  background: #f8f9fa;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0 14px;
+  transition: all 0.2s ease;
 }
 
 .el-input :deep(.el-input__wrapper.is-focus) {
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+  border-color: rgba(112, 100, 255, 0.85);
+  box-shadow: 0 0 0 3px rgba(112, 100, 255, 0.2);
 }
 
-.el-input :deep(input) {
-  font-size: 15px;
-  background: transparent;
-}
-
-.el-row {
+.code-row {
+  display: flex;
+  gap: 12px;
   align-items: center;
 }
 
-.el-button {
-  height: 44px;
+.code-row .el-button {
+  min-width: 140px;
+  height: 48px;
+  border-radius: 16px;
+}
+
+.form-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.submit-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 18px;
+  font-size: 16px;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  color: var(--primary);
   font-weight: 600;
+  cursor: pointer;
+  padding: 0;
 }
 
-.el-button--text {
-  color: #1a73e8;
-  font-weight: 500;
+.link-btn:hover {
+  color: var(--primary-dark);
 }
 
-@media (max-width: 520px) {
-  .register-card {
+@media (max-width: 720px) {
+  .auth-page {
+    padding: 40px 16px;
+  }
+
+  .auth-hero {
+    padding: 36px 28px;
+  }
+
+  .code-row {
+    flex-direction: column;
+  }
+
+  .code-row .el-button {
     width: 100%;
   }
 }

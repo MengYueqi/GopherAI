@@ -1,27 +1,95 @@
 <template>
   <div class="menu-container">
-    <el-header class="header">
-      <h1>AI应用平台</h1>
-      <el-button type="danger" @click="handleLogout">退出登录</el-button>
-    </el-header>
-    <el-main class="main">
+    <header class="menu-hero glass-panel">
+      <div class="hero-text">
+        <span class="pill">GopherAI Orchestrator</span>
+        <h1>集中管理对话、图像与知识</h1>
+        <p>
+          一处即可访问所有 AI 工具。我们重构了布局与层次，提供更具呼吸感的导航体验，
+          让你在不同模块间切换时更顺滑。
+        </p>
+        <div class="hero-meta">
+          <div>
+            <strong>02</strong>
+            <span>个应用可用</span>
+          </div>
+          <div>
+            <strong>∞</strong>
+            <span>对话字数</span>
+          </div>
+          <div>
+            <strong>24/7</strong>
+            <span>图像处理</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>登录中</span>
+        </div>
+        <el-button type="danger" plain @click="handleLogout">退出登录</el-button>
+      </div>
+    </header>
+
+    <section class="menu-subgrid">
+      <article class="summary-card glass-panel">
+        <h3>AI 聊天助手</h3>
+        <p>跨模型对话 · 流式回复 · 可选 Google 与专家模式</p>
+        <button type="button" @click="$router.push('/ai-chat')">立即进入</button>
+      </article>
+      <article class="summary-card glass-panel">
+        <h3>图像识别助手</h3>
+        <p>上传图片即可识别 · 多模型算力融合 · 自适应压缩</p>
+        <button type="button" @click="$router.push('/image-recognition')">开始识别</button>
+      </article>
+    </section>
+
+    <main class="menu-main">
       <div class="menu-grid">
-        <el-card class="menu-item" @click="$router.push('/ai-chat')">
+        <el-card class="menu-item glass-panel" @click="$router.push('/ai-chat')">
           <div class="card-content">
-            <el-icon size="48" color="#409eff"><ChatDotRound /></el-icon>
-            <h3>AI聊天</h3>
-            <p>与AI进行智能对话</p>
+            <div class="icon-ring chat">
+              <el-icon size="36"><ChatDotRound /></el-icon>
+            </div>
+            <div class="card-text">
+              <h3>AI 聊天</h3>
+              <p>多会话管理、模型切换、智能检索以及语音播报全都整合完毕。</p>
+              <ul>
+                <li>支持流式响应</li>
+                <li>RAG 检索模式</li>
+                <li>接入 Google 搜索</li>
+              </ul>
+            </div>
           </div>
+          <footer class="card-footer">
+            <span>最后访问 · 几分钟内</span>
+            <span class="cta">进入模块 →</span>
+          </footer>
         </el-card>
-        <el-card class="menu-item" @click="$router.push('/image-recognition')">
+
+        <el-card class="menu-item glass-panel" @click="$router.push('/image-recognition')">
           <div class="card-content">
-            <el-icon size="48" color="#67c23a"><Camera /></el-icon>
-            <h3>图像识别</h3>
-            <p>上传图片进行AI识别</p>
+            <div class="icon-ring vision">
+              <el-icon size="36"><Camera /></el-icon>
+            </div>
+            <div class="card-text">
+              <h3>图像识别</h3>
+              <p>快速上传图片，实时返回识别结果，支持移动端拖拽体验。</p>
+              <ul>
+                <li>即时上传反馈</li>
+                <li>识别历史清晰</li>
+                <li>自动保存结果</li>
+              </ul>
+            </div>
           </div>
+          <footer class="card-footer">
+            <span>最新模型 · 稳定在线</span>
+            <span class="cta">立即使用 →</span>
+          </footer>
         </el-card>
       </div>
-    </el-main>
+    </main>
   </div>
 </template>
 
@@ -66,93 +134,220 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
-  padding: 24px;
-  gap: 24px;
+  padding: 60px 6vw 80px;
+  gap: 32px;
 }
 
-.header {
-  background: #fff;
-  border-radius: 20px;
-  padding: 20px 32px;
-  box-shadow: 0 12px 30px rgba(60, 64, 67, 0.15);
+.menu-hero {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  border: 1px solid rgba(60, 64, 67, 0.08);
+  gap: 24px;
+  padding: 40px 48px;
+  position: relative;
+  overflow: hidden;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 600;
-  color: #202124;
+.menu-hero::after {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  top: -40px;
+  right: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent 70%);
 }
 
-.main {
-  flex: 1;
+.hero-text h1 {
+  font-size: 40px;
+  margin: 18px 0 16px;
+  line-height: 1.1;
+  color: var(--text-color);
+}
+
+.hero-text p {
+  max-width: 560px;
+}
+
+.hero-meta {
+  margin-top: 28px;
   display: flex;
-  justify-content: center;
+  gap: 32px;
+}
+
+.hero-meta strong {
+  font-size: 32px;
+  display: block;
+  line-height: 1;
+}
+
+.hero-meta span {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.status-pill {
+  display: inline-flex;
   align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.12);
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0f766e;
+}
+
+.menu-subgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.summary-card {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-card h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.summary-card p {
+  margin: 0;
+}
+
+.summary-card button {
+  align-self: flex-start;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 14px;
+  background: rgba(112, 100, 255, 0.1);
+  color: var(--primary-dark);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.summary-card button:hover {
+  background: rgba(112, 100, 255, 0.2);
+}
+
+.menu-main {
+  flex: 1;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  width: 100%;
-  max-width: 960px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 28px;
 }
 
 .menu-item {
   cursor: pointer;
-  border-radius: 20px;
-  border: 1px solid rgba(60, 64, 67, 0.12);
-  box-shadow: 0 12px 30px rgba(32, 33, 36, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  background: #fff;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .menu-item:hover {
-  transform: translateY(-4px);
-  border-color: rgba(26, 115, 232, 0.4);
-  box-shadow: 0 18px 36px rgba(26, 115, 232, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 40px 60px rgba(15, 23, 42, 0.18);
 }
 
 .card-content {
-  text-align: center;
-  padding: 42px 32px;
+  display: flex;
+  gap: 24px;
 }
 
-.el-icon {
-  display: block;
-  margin: 0 auto 16px;
-  color: #1a73e8;
-}
-
-.card-content h3 {
-  margin: 0 0 8px 0;
-  color: #202124;
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.card-content p {
+.card-text h3 {
   margin: 0;
-  color: #5f6368;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 24px;
 }
 
-@media (max-width: 768px) {
-  .menu-container {
-    padding: 16px;
+.card-text p {
+  margin: 10px 0 16px;
+}
+
+.card-text ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.icon-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 34px;
+}
+
+.icon-ring.chat {
+  background: linear-gradient(135deg, rgba(112, 100, 255, 0.15), rgba(14, 165, 233, 0.2));
+  color: #4338ca;
+}
+
+.icon-ring.vision {
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(248, 113, 113, 0.15));
+  color: #0f766e;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.cta {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+@media (max-width: 880px) {
+  .menu-hero {
+    flex-direction: column;
+    padding: 32px;
   }
 
-  .header {
-    flex-direction: column;
+  .hero-actions {
     align-items: flex-start;
-    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .menu-container {
+    padding: 48px 16px;
+  }
+
+  .card-content {
+    flex-direction: column;
   }
 }
 </style>
