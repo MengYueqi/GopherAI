@@ -1,0 +1,54 @@
+[mainConfig]
+appName = "GopherAI"
+host = "0.0.0.0"
+port = 9090
+
+[emailConfig]
+authcode = "your-email-auth-code"
+email = "your-email@example.com"
+
+[redisConfig]
+host = "127.0.0.1"
+port = 6379
+password = ""
+db = 0
+
+[mysqlConfig]
+host = "localhost"
+port = 3306
+user = "root"
+password = "your-mysql-password"
+databaseName = "GopherAI"
+charset = "utf8mb4"
+
+[jwtConfig]
+expire_duration = 8760 # hours
+issuer = "your-issuer"
+subject = "GopherAI"
+key = "your-jwt-secret"
+
+[rabbitmqConfig]
+host = "127.0.0.1"
+port = 5672
+username = "admin"
+password = "admin"
+vhost = "/"
+
+[ollamaConfig]
+baseURL = "http://localhost:11434"
+modelName = "gemma3:4b"
+
+[imageAIConfig]
+key = "your-dashscope-key"
+modelname = "qwen3-vl-plus"
+baseurl = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+
+[googleConfig]
+googleAPIKey = "your-google-api-key"
+googleSearchEngineID = "your-search-engine-id"
+
+[vikingDBConfig]
+AK = "your-vikingdb-ak"
+SK = "your-vikingdb-sk"
+collection = "your-collection-name"
+index = "your-index-name"

@@ -55,7 +55,7 @@ GopherAI 是一个基于 Go + Vue3 的 AI 应用服务平台，聚合了多会�
 
 ## ⚙️ 环境与配置
 
-1. 根据 `config/config.toml` 设置数据库、Redis、RabbitMQ、邮件等连接信息，并补充 `[googleConfig]`、`[vikingDBConfig]`、`[imageAIConfig]` 中的密钥与集合信息。
+1. 参考 `config/config.sample.toml` 复制为 `config/config.toml`，再根据实际环境补齐数据库、Redis、RabbitMQ、邮件、Google、VikingDB、ImageAI 等配置。
 2. 在 `config/env.sh` 中写入 DashScope（Qwen-Plus）兼容接口所需的 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL_NAME`，运行前执行 `source config/env.sh`。
 3. 如果需要本地 ONNX 推理，确保安装 ONNXRuntime 依赖，并设置 `config/env.sh` 中的 `LD_LIBRARY_PATH`。
 4. 保证上表列出的端口未被占用，或在配置文件中调整后同步更新 README。
