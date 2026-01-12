@@ -10,7 +10,7 @@
         </p>
         <div class="hero-meta">
           <div>
-            <strong>02</strong>
+            <strong>03</strong>
             <span>个应用可用</span>
           </div>
           <div>
@@ -42,6 +42,11 @@
         <h3>图像识别助手</h3>
         <p>上传图片即可识别 · 多模型算力融合 · 自适应压缩</p>
         <button type="button" @click="$router.push('/image-recognition')">开始识别</button>
+      </article>
+      <article class="summary-card glass-panel">
+        <h3>医疗建议助手</h3>
+        <p>输入症状或检查结果，生成结构化建议，辅助判断下一步行动。</p>
+        <button type="button" @click="$router.push('/medical-advice')">获取建议</button>
       </article>
     </section>
 
@@ -88,6 +93,27 @@
             <span class="cta">立即使用 →</span>
           </footer>
         </el-card>
+
+        <el-card class="menu-item glass-panel" @click="$router.push('/medical-advice')">
+          <div class="card-content">
+            <div class="icon-ring care">
+              <el-icon size="36"><FirstAidKit /></el-icon>
+            </div>
+            <div class="card-text">
+              <h3>医疗建议</h3>
+              <p>描述症状、用药或检查结果，AI 会返回可操作的医学建议。</p>
+              <ul>
+                <li>建议摘要即时生成</li>
+                <li>内置历史记录</li>
+                <li>独立页面更专注</li>
+              </ul>
+            </div>
+          </div>
+          <footer class="card-footer">
+            <span>全新模块 · 内测中</span>
+            <span class="cta">立即体验 →</span>
+          </footer>
+        </el-card>
       </div>
     </main>
   </div>
@@ -96,13 +122,14 @@
 <script>
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ChatDotRound, Camera } from '@element-plus/icons-vue'
+import { ChatDotRound, Camera, FirstAidKit } from '@element-plus/icons-vue'
 
 export default {
   name: 'MenuView',
   components: {
     ChatDotRound,
-    Camera
+    Camera,
+    FirstAidKit
   },
   setup() {
     const router = useRouter()
@@ -314,6 +341,11 @@ export default {
 .icon-ring.vision {
   background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(248, 113, 113, 0.15));
   color: #0f766e;
+}
+
+.icon-ring.care {
+  background: linear-gradient(135deg, rgba(248, 250, 229, 0.7), rgba(248, 113, 113, 0.35));
+  color: #b91c1c;
 }
 
 .card-footer {

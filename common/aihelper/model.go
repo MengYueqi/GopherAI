@@ -25,6 +25,7 @@ type StreamCallback func(msg string)
 type AIModel interface {
 	GenerateResponse(ctx context.Context, messages []*schema.Message, opts ...ToolOption) (*schema.Message, error)
 	StreamResponse(ctx context.Context, messages []*schema.Message, cb StreamCallback) (string, error)
+	GenerateMedicalAdviceResponse(ctx context.Context, messages []*schema.Message) (*schema.Message, error)
 	GetModelType() string
 }
 
@@ -33,7 +34,7 @@ type OpenAIModel struct {
 	llm model.ToolCallingChatModel
 }
 
-// TODO: 重构文件
+// TODO: 增加一个 MCP 的实现
 // 工具选择
 type ToolOptions struct {
 	usingGoogle bool
@@ -245,6 +246,15 @@ func (o *OpenAIModel) GenerateResponseWithGoogle(ctx context.Context, messages [
 	return resp, nil
 }
 
+func (o *OpenAIModel) GenerateMedicalAdviceResponse(ctx context.Context, messages []*schema.Message) (*schema.Message, error) {
+	resp, err := o.llm.Generate(ctx, messages)
+	messages[0].Content = "请根据以下症状描述，提供专业的医疗建议：" + messages[0].Content
+	if err != nil {
+		return nil, fmt.Errorf("openai generate medical advice failed: %v", err)
+	}
+	return resp, nil
+}
+
 func (o *OpenAIModel) StreamResponse(ctx context.Context, messages []*schema.Message, cb StreamCallback) (string, error) {
 	stream, err := o.llm.Stream(ctx, messages)
 	if err != nil {
@@ -325,3 +335,10 @@ func (o *OllamaModel) StreamResponse(ctx context.Context, messages []*schema.Mes
 }
 
 func (o *OllamaModel) GetModelType() string { return "ollama" }
+
+func (o *OllamaModel) GenerateMedicalAdviceResponse(ctx context.Context, messages []*schema.Message) (*schema.Message, error) {
+	return &schema.Message{
+		Role:    schema.Assistant,
+		Content: "这是一个医疗建议的回复示例。",
+	}, nil
+}

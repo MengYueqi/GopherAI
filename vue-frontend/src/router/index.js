@@ -4,6 +4,7 @@ import Register from '../views/Register.vue'
 import Menu from '../views/Menu.vue'
 import AIChat from '../views/AIChat.vue'
 import ImageRecognition from '../views/ImageRecognition.vue'
+import MedicalAdvice from '../views/MedicalAdvice.vue'
 
 const routes = [
   {
@@ -36,6 +37,12 @@ const routes = [
     path: '/image-recognition',
     name: 'ImageRecognition',
     component: ImageRecognition,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/medical-advice',
+    name: 'MedicalAdvice',
+    component: MedicalAdvice,
     meta: { requiresAuth: true }
   }
 ]

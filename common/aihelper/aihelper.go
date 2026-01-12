@@ -106,6 +106,27 @@ func (a *AIHelper) GenerateResponse(userName string, ctx context.Context, userQu
 	return modelMsg, nil
 }
 
+// 生成专业医疗建议
+func (a *AIHelper) GenerateMedicalAdviceResponse(ctx context.Context, description string) (*model.Message, error) {
+	//构建消息
+	messages := []*schema.Message{
+		{
+			Role:    schema.User,
+			Content: description,
+		},
+	}
+	//调用模型生成回复
+	schemaMsg, err := a.model.GenerateMedicalAdviceResponse(ctx, messages)
+	if err != nil {
+		return nil, err
+	}
+
+	//将schema.Message转化成model.Message
+	modelMsg := utils.ConvertToModelMessage(a.SessionID, "", schemaMsg)
+
+	return modelMsg, nil
+}
+
 // 流式生成
 // FIXME: 目前流式回调函数存在问题，还是都生成了再统一回复，同时到前端渲染也有问题
 func (a *AIHelper) StreamResponse(userName string, ctx context.Context, cb StreamCallback, userQuestion string) (*model.Message, error) {

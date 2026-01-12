@@ -49,6 +49,13 @@ type (
 		History []model.History `json:"history"`
 		controller.Response
 	}
+	MedicalAdviceRequest struct {
+		Description string `json:"description" binding:"required"` // 症状描述
+	}
+	MedicalAdviceResponse struct {
+		Advice string `json:"advice,omitempty"` // 医疗建议
+		controller.Response
+	}
 )
 
 func GetUserSessionsByUserName(c *gin.Context) {
@@ -63,6 +70,25 @@ func GetUserSessionsByUserName(c *gin.Context) {
 
 	res.Success()
 	res.Sessions = userSessions
+	c.JSON(http.StatusOK, res)
+}
+
+func GenerateMedicalAdvice(c *gin.Context) {
+	req := new(MedicalAdviceRequest)
+	res := new(MedicalAdviceResponse)
+	if err := c.ShouldBindJSON(req); err != nil {
+		c.JSON(http.StatusOK, res.CodeOf(code.CodeInvalidParams))
+		return
+	}
+	// 生成医疗建议
+	advice, code_ := session.GenerateMedicalAdvice(req.Description)
+
+	if code_ != code.CodeSuccess {
+		c.JSON(http.StatusOK, res.CodeOf(code_))
+		return
+	}
+	res.Success()
+	res.Advice = advice
 	c.JSON(http.StatusOK, res)
 }
 

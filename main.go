@@ -68,6 +68,7 @@ func readDataFromDB() error {
 }
 
 func main() {
+
 	conf := config.GetConfig()
 	host := conf.MainConfig.Host
 	port := conf.MainConfig.Port

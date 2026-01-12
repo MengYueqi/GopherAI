@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 
+	// "github.com/cloudwego/eino/schema"
 	"github.com/google/uuid"
 )
 
@@ -90,6 +91,29 @@ func CreateStreamSessionOnly(userName string, userQuestion string) (string, code
 		return "", code.CodeServerBusy
 	}
 	return createdSession.ID, code.CodeSuccess
+}
+
+func GenerateMedicalAdvice(description string) (string, code.Code) {
+	//2：获取AI模型
+	manager := aihelper.GetGlobalManager()
+	modelType := "1" // TODO: 目前写死为OpenAI模型，后续可以扩展
+	config := map[string]interface{}{
+		"apiKey": "your-api-key", // TODO: 从配置中获取
+	}
+	helper, err := manager.GetOrCreateAIHelper("system", "medical_advice_session", modelType, config)
+	if err != nil {
+		log.Println("GenerateMedicalAdvice GetOrCreateAIHelper error:", err)
+		return "", code.AIModelFail
+	}
+
+	//3：生成医疗建议
+	aiResponse, err_ := helper.GenerateMedicalAdviceResponse(ctx, description)
+	if err_ != nil {
+		log.Println("GenerateMedicalAdvice GenerateMedicalAdviceResponse error:", err_)
+		return "", code.AIModelFail
+	}
+
+	return aiResponse.Content, code.CodeSuccess
 }
 
 func StreamMessageToExistingSession(userName string, sessionID string, userQuestion string, modelType string, writer http.ResponseWriter) code.Code {
