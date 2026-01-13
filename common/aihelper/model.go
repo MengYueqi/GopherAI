@@ -72,7 +72,7 @@ func AddTodoFunc(_ context.Context, params string) (string, error) {
 func NewOpenAIModel(ctx context.Context) (*OpenAIModel, error) {
 	key := os.Getenv("OPENAI_API_KEY")
 	modelName := os.Getenv("OPENAI_MODEL_NAME")
-	baseURL := os.Getenv("OPENAI_BASE_URL")
+	baseURL := os.Getenv("OPENAI_BASE_URL_ALIYUN")
 
 	llm, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		BaseURL: baseURL,

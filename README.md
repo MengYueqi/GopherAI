@@ -18,7 +18,7 @@ GopherAI 是一个基于 Go + Vue3 的 AI 应用服务平台，聚合了多会�
 
 | 能力 | 使用场景 | 配置入口 | 说明 |
 | --- | --- | --- | --- |
-| Qwen-Plus（灵积 DashScope OpenAI 兼容接口） | 主聊天模型（`modelType=1`），支持 Google / RAG 工具调用 | `config/env.sh` → `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_MODEL_NAME` | 默认模型为 `qwen-plus`，通过 CloudWeGo EinO 对接 OpenAI Chat API 兼容层。 |
+| Qwen-Plus（灵积 DashScope OpenAI 兼容接口） | 主聊天模型（`modelType=1`），支持 Google / RAG 工具调用 | `config/env.sh` → `OPENAI_API_KEY` / `OPENAI_BASE_URL_ALIYUN` / `OPENAI_MODEL_NAME` | 默认模型为 `qwen-plus`，通过 CloudWeGo EinO 对接 OpenAI Chat API 兼容层。 |
 | Qwen3-VL-Plus | 图片理解 / 多模态问答 | `config/config.toml` → `[imageAIConfig]` | 依托 DashScope 兼容接口的多模态模型，`common/image` 已封装图片转 base64 的推理链路。 |
 | 火山引擎 VikingDB 向量数据库 | RAG 知识检索工具 | `config/config.toml` → `[vikingDBConfig]` | `common/tools` 中使用 AK/SK 构建 `Retriever`，`usingRAG=true` 时在回答中附带“参考资料”引用。 |
 | Google Custom Search JSON API | 外部实时搜索 | `config/config.toml` → `[googleConfig]` | 通过 CloudWeGo EinO ToolNode 暴露给 Qwen-Plus，开启 `usingGoogle=true` 后自动调用并将结果回注上下文。 |
@@ -56,7 +56,7 @@ GopherAI 是一个基于 Go + Vue3 的 AI 应用服务平台，聚合了多会�
 ## ⚙️ 环境与配置
 
 1. 参考 `config/config.sample.toml` 复制为 `config/config.toml`，再根据实际环境补齐数据库、Redis、RabbitMQ、邮件、Google、VikingDB、ImageAI 等配置。
-2. 在 `config/env.sh` 中写入 DashScope（Qwen-Plus）兼容接口所需的 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL_NAME`，运行前执行 `source config/env.sh`。
+2. 在 `config/env.sh` 中写入 DashScope（Qwen-Plus）兼容接口所需的 `OPENAI_API_KEY`、`OPENAI_BASE_URL_ALIYUN`、`OPENAI_MODEL_NAME`，运行前执行 `source config/env.sh`。
 3. 如果需要本地 ONNX 推理，确保安装 ONNXRuntime 依赖，并设置 `config/env.sh` 中的 `LD_LIBRARY_PATH`。
 4. 保证上表列出的端口未被占用，或在配置文件中调整后同步更新 README。
 
