@@ -108,15 +108,15 @@ func (a *AIHelper) GenerateResponse(userName string, ctx context.Context, userQu
 
 // 生成专业医疗建议
 func (a *AIHelper) GenerateMedicalAdviceResponse(ctx context.Context, description string) (*model.Message, error) {
-	//构建消息
-	messages := []*schema.Message{
-		{
-			Role:    schema.User,
-			Content: description,
-		},
-	}
+	// //构建消息
+	// messages := []*schema.Message{
+	// 	{
+	// 		Role:    schema.User,
+	// 		Content: description,
+	// 	},
+	// }
 	//调用模型生成回复
-	schemaMsg, err := a.model.GenerateMedicalAdviceResponse(ctx, messages)
+	schemaMsg, err := a.model.GenerateMedicalAdviceResponse(ctx, description)
 	if err != nil {
 		return nil, err
 	}
