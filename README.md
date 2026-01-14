@@ -44,6 +44,7 @@ GopherAI 是一个基于 Go + Vue3 的 AI 应用服务平台，聚合了多会�
 | MySQL | `3307` | 主业务数据库 `GopherAI` | `config/config.toml` → `[mysqlConfig] port` |
 | Redis | `6380` | 验证码、缓存等 | `config/config.toml` → `[redisConfig] port` |
 | RabbitMQ | `5672` | 异步消息/任务队列 | `config/config.toml` → `[rabbitmqConfig] port` |
+| MCP 工具服务 | `8081` | SSE 工具服务，URL: `http://localhost:8081/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
 
 ## 📁 主要目录
 
@@ -86,6 +87,16 @@ go mod download
 
 # 2. 启动后端
 go run main.go
+```
+
+## 🧰 启动 MCP 工具服务
+
+默认 MCP SSE 服务地址为 `http://localhost:8081/sse`。
+
+```bash
+cd common/tools/mcp/eino-mcp/tools/mcp-time
+go build -o mcp-time main.go
+./mcp-time -transport=sse -server_listen=localhost:8081
 ```
 
 前端：
