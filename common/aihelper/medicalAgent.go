@@ -2,6 +2,7 @@ package aihelper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +14,11 @@ import (
 )
 
 const medicalRedFlagPromptPath = "common/tools/prompt/medical_red_flag_system.txt"
+
+type ModelJudgment struct {
+	IsRedFlag bool   `json:"red_flag"`
+	Symptoms  string `json:"symptoms"`
+}
 
 func loadMedicalRedFlagPrompt() (string, error) {
 	data, err := os.ReadFile(medicalRedFlagPromptPath)
@@ -42,10 +48,42 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 
 	_ = g.AddChatTemplateNode("nodeOfRedFlagPrompt", red_flag_pt)
 	_ = g.AddChatModelNode("distinctRedFlag", o.llm, compose.WithNodeName("ChatModel"))
+	_ = g.AddLambdaNode("getJSON", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (ModelJudgment, error) {
+		// 解析模型输出，提取红旗信息
+		outputContent := input.Content
+		log.Printf("Model output for red flag classification: %s\n", outputContent)
+		// 根据输入的 JSON 字符串，提取 is_red_flag 字段
+		var mj ModelJudgment
+		err = json.Unmarshal([]byte(outputContent), &mj)
+		log.Printf("Parsed ModelJudgment: %+v\n", mj)
+		return mj, nil
+	}))
+
+	divide_red_flag_condition := compose.NewGraphBranch(
+		isRedFlag,
+		map[string]bool{
+			"red_flag_condition":    true,
+			"no_red_flag_condition": true,
+		},
+	)
+
+	// 占位 red_flag_condition 和 no_red_flag_condition 节点
+	_ = g.AddLambdaNode("red_flag_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res *schema.Message, err error) {
+		log.Printf("Final red flag classification result: %+v\n", input)
+		return &schema.Message{Content: "紧急情况，请立即就医"}, nil
+	}))
+	_ = g.AddLambdaNode("no_red_flag_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res *schema.Message, err error) {
+		log.Printf("Final no red flag classification result: %+v\n", input)
+		return &schema.Message{Content: "非紧急情况，请预约医生进行进一步检查"}, nil
+	}))
+
 	// 对症状进行红旗分类
 	_ = g.AddEdge(compose.START, "nodeOfRedFlagPrompt")
 	_ = g.AddEdge("nodeOfRedFlagPrompt", "distinctRedFlag")
-	_ = g.AddEdge("distinctRedFlag", compose.END)
+	_ = g.AddEdge("distinctRedFlag", "getJSON")
+	_ = g.AddBranch("getJSON", divide_red_flag_condition)
+	_ = g.AddEdge("red_flag_condition", compose.END)
+	_ = g.AddEdge("no_red_flag_condition", compose.END)
 
 	r, err := g.Compile(ctx)
 	if err != nil {
@@ -63,4 +101,14 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	}
 	fmt.Println("invoke result: ", ret)
 	return ret, nil
+}
+
+func isRedFlag(ctx context.Context, prevJ ModelJudgment) (string, error) {
+	result := prevJ.IsRedFlag
+	log.Printf("isRedFlag result: %v", result)
+	if result {
+		return "red_flag_condition", nil
+	} else {
+		return "no_red_flag_condition", nil
+	}
 }
