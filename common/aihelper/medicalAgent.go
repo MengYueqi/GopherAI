@@ -8,26 +8,31 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudwego/eino-ext/components/tool/mcp"
+	"github.com/cloudwego/eino/adk"
 	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
 )
 
 const medicalRedFlagPromptPath = "common/tools/prompt/medical_red_flag_system.txt"
+const medicalRedFlagNoticePath = "common/tools/prompt/medical_red_flag_notice.txt"
+const myBaseURL = "http://localhost:8081/sse"
 
 type ModelJudgment struct {
 	IsRedFlag bool   `json:"red_flag"`
 	Symptoms  string `json:"symptoms"`
+	Address   string `json:"address,omitempty"`
 }
 
-func loadMedicalRedFlagPrompt() (string, error) {
-	data, err := os.ReadFile(medicalRedFlagPromptPath)
+func loadPromptFile(path string) (string, error) {
+	data, err := os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("failed to read prompt file %s: %w", medicalRedFlagPromptPath, err)
+		return "", fmt.Errorf("failed to read prompt file %s: %w", path, err)
 	}
 	content := strings.TrimSpace(string(data))
 	if content == "" {
-		return "", fmt.Errorf("prompt file %s is empty", medicalRedFlagPromptPath)
+		return "", fmt.Errorf("prompt file %s is empty", path)
 	}
 	return content, nil
 }
@@ -35,7 +40,7 @@ func loadMedicalRedFlagPrompt() (string, error) {
 func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) (*schema.Message, error) {
 	// 构建医疗建议的响应逻辑
 	g := compose.NewGraph[map[string]any, *schema.Message]()
-	systemPrompt, err := loadMedicalRedFlagPrompt()
+	systemPrompt, err := loadPromptFile(medicalRedFlagPromptPath)
 	if err != nil {
 		log.Printf("ERROR: %v\n", err)
 		return nil, err
@@ -68,13 +73,71 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	)
 
 	// 占位 red_flag_condition 和 no_red_flag_condition 节点
-	_ = g.AddLambdaNode("red_flag_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res *schema.Message, err error) {
+	_ = g.AddLambdaNode("red_flag_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res []*schema.Message, err error) {
 		log.Printf("Final red flag classification result: %+v\n", input)
-		return &schema.Message{Content: "紧急情况，请立即就医"}, nil
+		// 构造 prompt，使用模型生成紧急医疗建议
+		pt := fmt.Sprintf("目前初步判断为危险事件，请根据初步的判断和症状给出建议：%+v", input)
+		return []*schema.Message{
+			{
+				Role:    schema.Assistant,
+				Content: pt,
+			},
+		}, nil
 	}))
+
+	// // 构建处理红色情况提示
+	cli, err := initMCPClient(ctx, myBaseURL)
+	if err != nil {
+		log.Printf("ERROR initializing MCP client: %v\n", err)
+		return nil, err
+	}
+	tools, err := mcp.GetTools(ctx, &mcp.Config{Cli: cli})
+	red_flag_agent, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
+		Name:        "EmergencyMedicalExpert",
+		Description: "紧急医疗事件处理专家",
+		Instruction: `你是紧急医疗事件处理专家。根据用户描述，快速判断风险并给出紧急处置建议；必要时提示立即联系急救或就医。`,
+		Model:       o.llm,
+		ToolsConfig: adk.ToolsConfig{
+			ToolsNodeConfig: compose.ToolsNodeConfig{Tools: tools},
+		},
+	})
+
+	_ = g.AddLambdaNode("red_flag_deal", compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (res *schema.Message, err error) {
+		log.Printf("Handling red flag case with symptoms: %+v\n", input)
+		// 使用 agent 处理红旗情况
+		runner := adk.NewRunner(ctx, adk.RunnerConfig{
+			Agent: red_flag_agent,
+		})
+		iter := runner.Query(ctx, input[0].Content)
+		var allmsg string
+		for {
+			event, ok := iter.Next()
+			if !ok {
+				break
+			}
+			if event.Err != nil {
+				log.Fatal(event.Err)
+			}
+			msg, err := event.Output.MessageOutput.GetMessage()
+			if err != nil {
+				log.Fatal(err)
+			}
+			allmsg = msg.Content
+			fmt.Printf("\nmessage:\n%v\n======", msg.Content)
+		}
+		return &schema.Message{Content: allmsg}, nil
+	}))
+
+	// _ = g.AddChatModelNode("red_flag_deal", o.llm, compose.WithNodeName("RedFlagChatModel"))
+
 	_ = g.AddLambdaNode("no_red_flag_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res *schema.Message, err error) {
 		log.Printf("Final no red flag classification result: %+v\n", input)
-		return &schema.Message{Content: "非紧急情况，请预约医生进行进一步检查"}, nil
+		noticeTemplate, err := loadPromptFile(medicalRedFlagNoticePath)
+		if err != nil {
+			return nil, err
+		}
+		content := strings.ReplaceAll(noticeTemplate, "{symptoms}", input.Symptoms)
+		return &schema.Message{Content: content}, nil
 	}))
 
 	// 对症状进行红旗分类
@@ -82,7 +145,10 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	_ = g.AddEdge("nodeOfRedFlagPrompt", "distinctRedFlag")
 	_ = g.AddEdge("distinctRedFlag", "getJSON")
 	_ = g.AddBranch("getJSON", divide_red_flag_condition)
-	_ = g.AddEdge("red_flag_condition", compose.END)
+	// 红旗事件处理
+	_ = g.AddEdge("red_flag_condition", "red_flag_deal")
+	_ = g.AddEdge("red_flag_deal", compose.END)
+	// 非红旗事件处理
 	_ = g.AddEdge("no_red_flag_condition", compose.END)
 
 	r, err := g.Compile(ctx)
