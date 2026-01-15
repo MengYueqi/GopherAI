@@ -73,7 +73,7 @@ func (o *OpenAIModel) NewTravelGuideRecommendationAgent(ctx context.Context, too
 
 	sequentialAgent, err := adk.NewSequentialAgent(ctx, &adk.SequentialAgentConfig{
 		Name:        "TravelGuideRecommendationPipeline",
-		Description: "旅游攻略推荐流水线：路线规划 → 机票建议 → 每日攻略",
+		Description: "你需要合理规划多个 agent 的执行顺序，以生成完整的旅游攻略推荐。",
 		SubAgents:   []adk.Agent{analyzer, summarizer, generator},
 	})
 	if err != nil {
