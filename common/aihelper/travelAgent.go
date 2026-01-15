@@ -2,7 +2,6 @@ package aihelper
 
 import (
 	"context"
-	"log"
 
 	"github.com/cloudwego/eino/adk"
 	"github.com/cloudwego/eino/components/tool"
@@ -10,8 +9,8 @@ import (
 )
 
 // 总体路线构建 Agent
-func (o *OpenAIModel) NewOverallRoutePlannerAgent(tools []tool.BaseTool) adk.Agent {
-	a, err := adk.NewChatModelAgent(context.Background(), &adk.ChatModelAgentConfig{
+func (o *OpenAIModel) NewOverallRoutePlannerAgent(ctx context.Context, tools []tool.BaseTool) (adk.Agent, error) {
+	a, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "OverallRoutePlanner",
 		Description: "构建总体旅行路线与行程节奏",
 		Instruction: "你是总体路线规划专家。基于用户需求给出完整的路线框架、城市/区域顺序、交通方式选择和节奏建议，确保可执行且逻辑清晰。",
@@ -22,14 +21,14 @@ func (o *OpenAIModel) NewOverallRoutePlannerAgent(tools []tool.BaseTool) adk.Age
 		MaxIterations: 50,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return a
+	return a, nil
 }
 
 // 机票推荐及价格评估 Agent
-func (o *OpenAIModel) NewFlightAdvisorAgent(tools []tool.BaseTool) adk.Agent {
-	a, err := adk.NewChatModelAgent(context.Background(), &adk.ChatModelAgentConfig{
+func (o *OpenAIModel) NewFlightAdvisorAgent(ctx context.Context, tools []tool.BaseTool) (adk.Agent, error) {
+	a, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "FlightAdvisor",
 		Description: "推荐机票选择并评估价格区间",
 		Instruction: "你是机票推荐与价格评估助手。根据行程时间与出发/到达城市，给出航班选择建议、价格区间判断、购票时机与省钱策略，避免虚构具体航班号。",
@@ -40,17 +39,17 @@ func (o *OpenAIModel) NewFlightAdvisorAgent(tools []tool.BaseTool) adk.Agent {
 		MaxIterations: 50,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return a
+	return a, nil
 }
 
-// 每日游览攻略构建 Agent
-func (o *OpenAIModel) NewDailyItineraryBuilderAgent(tools []tool.BaseTool) adk.Agent {
-	a, err := adk.NewChatModelAgent(context.Background(), &adk.ChatModelAgentConfig{
+// 重要景点介绍生成 Agent
+func (o *OpenAIModel) NewAttractionHighlightsAgent(ctx context.Context, tools []tool.BaseTool) (adk.Agent, error) {
+	a, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "DailyItineraryBuilder",
-		Description: "生成逐日游览攻略",
-		Instruction: "你是每日游览攻略规划助手。按天安排景点与活动顺序，给出合理的出行时间、交通衔接和休息安排，控制节奏并提供可选调整。",
+		Description: "生成重要景点介绍",
+		Instruction: "你是重要景点介绍助手。根据目的地与用户偏好，精选关键景点在特定的部分进行介绍。介绍要尽量详细，包含历史背景、文化意义和独特体验，帮助用户了解景点亮点。",
 		Model:       o.llm,
 		ToolsConfig: adk.ToolsConfig{
 			ToolsNodeConfig: compose.ToolsNodeConfig{Tools: tools},
@@ -58,29 +57,38 @@ func (o *OpenAIModel) NewDailyItineraryBuilderAgent(tools []tool.BaseTool) adk.A
 		MaxIterations: 50,
 	})
 	if err != nil {
-		log.Fatal(err)
-	}
-	return a
-}
-
-// 旅游攻略推荐 SequentialAgent
-func (o *OpenAIModel) NewTravelGuideRecommendationAgent(ctx context.Context, tools []tool.BaseTool) (adk.Agent, error) {
-	// TODO: 增加携程旅行等获取票价的 tools
-	// TODO: 增加每个 agent 不同的 tools 配置
-	analyzer := o.NewOverallRoutePlannerAgent(tools)
-	summarizer := o.NewFlightAdvisorAgent(tools)
-	generator := o.NewDailyItineraryBuilderAgent(tools)
-
-	sequentialAgent, err := adk.NewSequentialAgent(ctx, &adk.SequentialAgentConfig{
-		Name:        "TravelGuideRecommendationPipeline",
-		Description: "你需要合理规划多个 agent 的执行顺序，以生成完整的旅游攻略推荐。",
-		SubAgents:   []adk.Agent{analyzer, summarizer, generator},
-	})
-	if err != nil {
 		return nil, err
 	}
-	return sequentialAgent, nil
+	return a, nil
 }
+
+// // 旅游攻略推荐 SequentialAgent
+// func (o *OpenAIModel) NewTravelGuideRecommendationAgent(ctx context.Context, tools []tool.BaseTool) (adk.Agent, error) {
+// 	// TODO: 增加携程旅行等获取票价的 tools
+// 	// TODO: 增加每个 agent 不同的 tools 配置
+// 	analyzer, err := o.NewOverallRoutePlannerAgent(ctx, tools)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	summarizer, err := o.NewFlightAdvisorAgent(ctx, tools)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	generator, err := o.NewAttractionHighlightsAgent(ctx, tools)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	sequentialAgent, err := adk.NewSequentialAgent(ctx, &adk.SequentialAgentConfig{
+// 		Name:        "TravelGuideRecommendationPipeline",
+// 		Description: "你需要合理规划多个 agent 的执行顺序，以生成完整的旅游攻略推荐。攻略包括路线规划、机票建议和景点介绍等方面内容。",
+// 		SubAgents:   []adk.Agent{analyzer, summarizer, generator},
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return sequentialAgent, nil
+// }
 
 // func main() {
 // 	ctx := context.Background()

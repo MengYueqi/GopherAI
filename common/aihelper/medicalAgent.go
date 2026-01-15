@@ -18,6 +18,7 @@ import (
 const medicalRedFlagPromptPath = "common/tools/prompt/medical_red_flag_system.txt"
 const medicalRedFlagNoticePath = "common/tools/prompt/medical_red_flag_notice.txt"
 const medicalNoRedFlagNoticePath = "common/tools/prompt/medical_no_red_flag_notice.txt"
+const medicalSummaryPromptPath = "common/tools/prompt/medical_summary_prompt.txt"
 const myBaseURL = "http://localhost:8081/sse"
 
 type ModelJudgment struct {
@@ -50,6 +51,16 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		schema.FString,
 		schema.SystemMessage(systemPrompt),
 		schema.UserMessage("旅行需求描述：{description}"),
+	)
+	summaryPrompt, err := loadPromptFile(medicalSummaryPromptPath)
+	if err != nil {
+		log.Printf("ERROR: %v\n", err)
+		return nil, err
+	}
+	summary_pt := prompt.FromMessages(
+		schema.FString,
+		schema.SystemMessage(summaryPrompt),
+		schema.UserMessage("规划内容：{content}"),
 	)
 
 	_ = g.AddChatTemplateNode("nodeOfPlanFeasibilityPrompt", red_flag_pt)
@@ -97,6 +108,10 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		return nil, err
 	}
 	tools, err := mcp.GetTools(ctx, &mcp.Config{Cli: cli})
+	if err != nil {
+		log.Printf("ERROR getting MCP tools: %v\n", err)
+		return nil, err
+	}
 	red_flag_agent, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "TravelFeasibilityAdvisor",
 		Description: "旅游行程可行性评估与需求完善助手",
@@ -106,6 +121,10 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 			ToolsNodeConfig: compose.ToolsNodeConfig{Tools: tools},
 		},
 	})
+	if err != nil {
+		log.Printf("ERROR creating red flag agent: %v\n", err)
+		return nil, err
+	}
 	// no_red_flag_agent, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 	// 	Name:        "TravelRoutePlanner",
 	// 	Description: "旅游路径规划与行程设计助手",
@@ -116,7 +135,23 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	// 	},
 	// })
 
-	no_red_flag_agent, err := o.NewTravelGuideRecommendationAgent(ctx, tools)
+	// no_red_flag_agent, err := o.NewTravelGuideRecommendationAgent(ctx, tools)
+
+	overallRoutePlanner, err := o.NewOverallRoutePlannerAgent(ctx, tools)
+	if err != nil {
+		log.Printf("ERROR creating overall route planner: %v\n", err)
+		return nil, err
+	}
+	flightPlanner, err := o.NewFlightAdvisorAgent(ctx, tools)
+	if err != nil {
+		log.Printf("ERROR creating flight planner: %v\n", err)
+		return nil, err
+	}
+	attractionPlanner, err := o.NewAttractionHighlightsAgent(ctx, tools)
+	if err != nil {
+		log.Printf("ERROR creating attraction planner: %v\n", err)
+		return nil, err
+	}
 
 	_ = g.AddLambdaNode("plan_blocked_deal", compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (res *schema.Message, err error) {
 		log.Printf("Handling plan blocked case with request: %+v\n", input)
@@ -161,35 +196,95 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 			},
 		}, nil
 	}))
-	_ = g.AddLambdaNode("plan_route_deal", compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (res *schema.Message, err error) {
-		log.Printf("Handling plan allowed case with request: %+v\n", input)
+
+	// 绑定 overallRoutePlanner agent 节点
+	_ = g.AddLambdaNode("overall_route_planner", compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (res *schema.Message, err error) {
+		log.Printf("Handling overall route planning with request: %+v\n", input)
 		runner := adk.NewRunner(ctx, adk.RunnerConfig{
-			Agent: no_red_flag_agent,
+			Agent: overallRoutePlanner,
 		})
 		iter := runner.Query(ctx, input[0].Content)
 		var allmsg string
-		stepCount := 1
 		for {
 			event, ok := iter.Next()
 			if !ok {
 				break
 			}
 			if event.Err != nil {
-				log.Fatal(event.Err)
+				return nil, event.Err
 			}
 			msg, err := event.Output.MessageOutput.GetMessage()
 			if err != nil {
-				log.Fatal(err)
+				return nil, err
 			}
 			allmsg = msg.Content
-			if event.Output != nil && event.Output.MessageOutput != nil {
-				fmt.Printf("\n=== 步骤 %d: %s ===\n", stepCount, event.AgentName)
-				fmt.Printf("%s\n", event.Output.MessageOutput.Message.Content)
-				stepCount++
-			}
 		}
 		return &schema.Message{Content: allmsg}, nil
 	}))
+
+	// 绑定 flightPlanner agent 节点
+	_ = g.AddLambdaNode("flight_planner", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (res map[string]any, err error) {
+		log.Printf("Handling flight planning with request: %+v\n", input)
+		runner := adk.NewRunner(ctx, adk.RunnerConfig{
+			Agent: flightPlanner,
+		})
+		iter := runner.Query(ctx, input.Content)
+		var allmsg string
+		for {
+			event, ok := iter.Next()
+			if !ok {
+				break
+			}
+			if event.Err != nil {
+				return nil, event.Err
+			}
+			msg, err := event.Output.MessageOutput.GetMessage()
+			if err != nil {
+				return nil, err
+			}
+			allmsg = msg.Content
+		}
+		return map[string]any{"航班规划": allmsg}, nil
+	}))
+
+	// 绑定 attractionPlanner agent 节点
+	_ = g.AddLambdaNode("attraction_planner", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (res map[string]any, err error) {
+		log.Printf("Handling attraction highlights with request: %+v\n", input)
+		runner := adk.NewRunner(ctx, adk.RunnerConfig{
+			Agent: attractionPlanner,
+		})
+		iter := runner.Query(ctx, input.Content)
+		var allmsg string
+		for {
+			event, ok := iter.Next()
+			if !ok {
+				break
+			}
+			if event.Err != nil {
+				return nil, event.Err
+			}
+			msg, err := event.Output.MessageOutput.GetMessage()
+			if err != nil {
+				return nil, err
+			}
+			allmsg = msg.Content
+		}
+		return map[string]any{"重点景点规划": allmsg}, nil
+	}))
+	_ = g.AddLambdaNode("summary_prompt_input", compose.InvokableLambda(func(ctx context.Context, input map[string]any) (map[string]any, error) {
+		// 整合各部分内容到一个字符串
+		content := ""
+		for k, v := range input {
+			content += fmt.Sprintf("%s：%s\n", k, v)
+		}
+		log.Printf("Summary prompt input content: %s\n", content)
+		return map[string]any{"content": content}, nil
+	}))
+	_ = g.AddLambdaNode("change_overall_output", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (map[string]any, error) {
+		return map[string]any{"overall": input.Content}, nil
+	}))
+	_ = g.AddChatTemplateNode("summary_prompt", summary_pt)
+	_ = g.AddChatModelNode("summary_model", o.llm, compose.WithNodeName("ChatModel"))
 
 	// 对旅行需求进行可行性分类
 	_ = g.AddEdge(compose.START, "nodeOfPlanFeasibilityPrompt")
@@ -200,8 +295,16 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	_ = g.AddEdge("plan_blocked_condition", "plan_blocked_deal")
 	_ = g.AddEdge("plan_blocked_deal", compose.END)
 	// 可规划情况处理
-	_ = g.AddEdge("plan_allowed_condition", "plan_route_deal")
-	_ = g.AddEdge("plan_route_deal", compose.END)
+	_ = g.AddEdge("plan_allowed_condition", "overall_route_planner")
+	_ = g.AddEdge("overall_route_planner", "flight_planner")
+	_ = g.AddEdge("overall_route_planner", "attraction_planner")
+	_ = g.AddEdge("overall_route_planner", "change_overall_output")
+	_ = g.AddEdge("flight_planner", "summary_prompt_input")
+	_ = g.AddEdge("attraction_planner", "summary_prompt_input")
+	_ = g.AddEdge("change_overall_output", "summary_prompt_input")
+	_ = g.AddEdge("summary_prompt_input", "summary_prompt")
+	_ = g.AddEdge("summary_prompt", "summary_model")
+	_ = g.AddEdge("summary_model", compose.END)
 
 	r, err := g.Compile(ctx)
 	if err != nil {
