@@ -76,7 +76,7 @@
           >
             <span class="chip-indicator rag"></span>
             <span class="chip-text">
-              <strong>专家问诊</strong>
+              <strong>行程增强</strong>
               <small>{{ isUsingRAG ? 'RAG 检索' : '默认模式' }}</small>
             </span>
           </button>
@@ -211,7 +211,7 @@ export default {
 
     const toggleGoogle = () => {
       if (!isUsingGoogle.value && isUsingRAG.value) {
-        ElMessage.warning('Google 搜索和专家问诊不能同时启用，请先关闭专家问诊')
+        ElMessage.warning('Google 搜索和行程增强不能同时启用，请先关闭行程增强')
         return
       }
       isUsingGoogle.value = !isUsingGoogle.value
@@ -219,7 +219,7 @@ export default {
 
     const toggleRAG = () => {
       if (!isUsingRAG.value && isUsingGoogle.value) {
-        ElMessage.warning('Google 搜索和专家问诊不能同时启用，请先关闭 Google 搜索')
+        ElMessage.warning('Google 搜索和行程增强不能同时启用，请先关闭 Google 搜索')
         return
       }
       isUsingRAG.value = !isUsingRAG.value

@@ -1,12 +1,12 @@
-# Go项目推荐：AI应用服务平台（GopherAI）
+# Go项目推荐：AI 旅行规划服务平台（GopherAI）
 
-GopherAI 是一个基于 Go + Vue3 的 AI 应用服务平台，聚合了多会话聊天、图像识别、流式输出等典型 AI 能力，配套 MySQL / Redis / RabbitMQ 等基础设施，可直接作为全栈示例或生产级骨架使用。
+GopherAI 是一个基于 Go + Vue3 的 AI 旅行规划服务平台，聚合了多会话聊天、图像识别、流式输出等典型 AI 能力，并内置旅行路线规划工作流，配套 MySQL / Redis / RabbitMQ 等基础设施，可直接作为全栈示例或生产级骨架使用。
 
 ## 🚀 核心特性
 
 - **多会话 AI 助手**：Gin + GORM + Redis 维护用户上下文，RabbitMQ 异步写入历史消息，前端通过 SSE 实时接收回复。
 - **图像识别链路**：提供图片上传、预处理、ONNXRuntime 推理到分类标签输出的全流程代码，便于扩展更多视觉模型。
-- **医疗助手能力**：基于 Graph 编排 AI 能力，按问题等级分流到不同 Agent，并结合 Agent + MCP 工具调用完成处理。
+- **旅游规划能力**：基于 Graph 编排 AI 能力，按需求完整度分流到不同 Agent，并结合 Agent + MCP 工具调用完成路线建议与可行性补全。
 - **Google 搜索工具链**：在请求体中指定 `usingGoogle=true`，Qwen-Plus 会借助 CloudWeGo EinO ToolNode 调用 Google Custom Search API，把最新网页结果注入上下文后生成回答。
 - **VikingDB RAG 检索**：设置 `usingRAG=true` 时，服务会利用火山引擎 VikingDB Retriever 召回业务知识库，在回答里追加“参考资料”段落，保证可追溯性。
 - **流式推理与消息落库**：支持会话首次创建与既有会话触发 SSE 流式回答，消息借助 RabbitMQ 异步入库，保证高并发下的实时体验与可靠性。
@@ -68,7 +68,7 @@ GopherAI 是一个基于 Go + Vue3 的 AI 应用服务平台，聚合了多会�
 
 ```json
 {
-  "question": "介绍最新的医学研究进展",
+  "question": "从上海出发 5 天游成都，喜欢美食和慢节奏",
   "modelType": "1",
   "sessionId": "xxxx",        // 新会话可省略
   "usingGoogle": true,        // 调用 Google Search Tool

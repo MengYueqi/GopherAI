@@ -44,9 +44,9 @@
         <button type="button" @click="$router.push('/image-recognition')">开始识别</button>
       </article>
       <article class="summary-card glass-panel">
-        <h3>医疗建议助手</h3>
-        <p>输入症状或检查结果，生成结构化建议，辅助判断下一步行动。</p>
-        <button type="button" @click="$router.push('/medical-advice')">获取建议</button>
+        <h3>旅游规划助手</h3>
+        <p>输入出发地、目的地与偏好，生成可执行的旅行行程与节奏建议。</p>
+        <button type="button" @click="$router.push('/travel-planning')">开始规划</button>
       </article>
     </section>
 
@@ -94,24 +94,24 @@
           </footer>
         </el-card>
 
-        <el-card class="menu-item glass-panel" @click="$router.push('/medical-advice')">
+        <el-card class="menu-item glass-panel" @click="$router.push('/travel-planning')">
           <div class="card-content">
-            <div class="icon-ring care">
-              <el-icon size="36"><FirstAidKit /></el-icon>
+            <div class="icon-ring travel">
+              <el-icon size="36"><MapLocation /></el-icon>
             </div>
             <div class="card-text">
-              <h3>医疗建议</h3>
-              <p>描述症状、用药或检查结果，AI 会返回可操作的医学建议。</p>
+              <h3>旅游规划</h3>
+              <p>描述出行需求、预算与偏好，AI 会生成分天行程与交通建议。</p>
               <ul>
-                <li>建议摘要即时生成</li>
-                <li>内置历史记录</li>
-                <li>独立页面更专注</li>
+                <li>行程骨架快速生成</li>
+                <li>交通与节奏建议</li>
+                <li>支持个性化偏好</li>
               </ul>
             </div>
           </div>
           <footer class="card-footer">
-            <span>全新模块 · 内测中</span>
-            <span class="cta">立即体验 →</span>
+            <span>行程规划 · 即刻生成</span>
+            <span class="cta">开始规划 →</span>
           </footer>
         </el-card>
       </div>
@@ -122,14 +122,14 @@
 <script>
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ChatDotRound, Camera, FirstAidKit } from '@element-plus/icons-vue'
+import { ChatDotRound, Camera, MapLocation } from '@element-plus/icons-vue'
 
 export default {
   name: 'MenuView',
   components: {
     ChatDotRound,
     Camera,
-    FirstAidKit
+    MapLocation
   },
   setup() {
     const router = useRouter()
@@ -343,9 +343,9 @@ export default {
   color: #0f766e;
 }
 
-.icon-ring.care {
-  background: linear-gradient(135deg, rgba(248, 250, 229, 0.7), rgba(248, 113, 113, 0.35));
-  color: #b91c1c;
+.icon-ring.travel {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.18));
+  color: #0f766e;
 }
 
 .card-footer {

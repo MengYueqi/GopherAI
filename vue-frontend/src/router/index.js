@@ -4,7 +4,7 @@ import Register from '../views/Register.vue'
 import Menu from '../views/Menu.vue'
 import AIChat from '../views/AIChat.vue'
 import ImageRecognition from '../views/ImageRecognition.vue'
-import MedicalAdvice from '../views/MedicalAdvice.vue'
+import TravelPlanning from '../views/TravelPlanning.vue'
 
 const routes = [
   {
@@ -40,9 +40,9 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/medical-advice',
-    name: 'MedicalAdvice',
-    component: MedicalAdvice,
+    path: '/travel-planning',
+    name: 'TravelPlanning',
+    component: TravelPlanning,
     meta: { requiresAuth: true }
   }
 ]

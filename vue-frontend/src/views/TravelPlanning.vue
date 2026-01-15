@@ -1,20 +1,20 @@
 <template>
-  <div class="medical-advice-page">
+  <div class="travel-planning-page">
     <section class="input-panel glass-panel">
       <div class="panel-header">
         <div>
-          <span class="pill">Medical Agent</span>
-          <h1>AI 医疗建议助手</h1>
-          <p>描述症状或检查结果，我们会为你生成结构化的建议，仅供学习参考。</p>
+          <span class="pill">Travel Planner</span>
+          <h1>AI 旅游规划助手</h1>
+          <p>输入出发地、目的地、天数与偏好，我们会为你生成可执行的行程建议。</p>
         </div>
         <button type="button" class="back-btn" @click="$router.push('/menu')">← 返回</button>
       </div>
 
-      <label for="symptom-input" class="field-label">症状或场景描述</label>
+      <label for="travel-input" class="field-label">行程需求描述</label>
       <textarea
-        id="symptom-input"
+        id="travel-input"
         v-model="description"
-        placeholder="例如：最近持续咳嗽伴随低烧，需要了解可能的原因与建议"
+        placeholder="例如：从上海出发，7 天游云南，喜欢自然风景，预算 6k 左右"
         :disabled="loading"
         rows="6"
       ></textarea>
@@ -26,16 +26,13 @@
           :disabled="loading || !description.trim()"
           @click="submitAdvice"
         >
-          {{ loading ? '生成中…' : '生成建议' }}
+          {{ loading ? '生成中…' : '生成行程' }}
         </button>
-        <button type="button" class="secondary-btn" :disabled="!history.length" @click="clearHistory">
-          清空历史
-        </button>
+        <span v-if="loading" class="timer">已用时 {{ elapsedSeconds }}s</span>
       </div>
-      <p class="disclaimer">⚠️ 本页面仅供学习与研究，无法替代专业医生诊断。</p>
 
       <div class="result-card" v-if="currentAdvice">
-        <h3>最新建议</h3>
+        <h3>最新行程</h3>
         <MdPreview
           :modelValue="currentAdvice"
           previewTheme="github"
@@ -43,45 +40,20 @@
         />
       </div>
       <div class="empty-state" v-else>
-        <p>提交问题后，这里会展示 AI 返回的建议摘要。</p>
-      </div>
-    </section>
-
-    <section class="history-panel glass-panel">
-      <div class="panel-header">
-        <div>
-          <h2>历史记录</h2>
-          <p>最近 {{ history.length }} 条查询</p>
-        </div>
-      </div>
-      <ul class="history-list" v-if="history.length">
-        <li v-for="(item, index) in history" :key="`${item.time}-${index}`">
-          <div class="history-meta">
-            <strong>{{ item.time }}</strong>
-            <span>{{ item.description }}</span>
-          </div>
-          <MdPreview
-            :modelValue="item.advice"
-            previewTheme="github"
-            :showCodeRowNumber="false"
-          />
-        </li>
-      </ul>
-      <div class="empty-state" v-else>
-        <p>历史记录为空，生成成功的建议会自动保存在这里。</p>
+        <p>提交需求后，这里会展示 AI 返回的行程规划。</p>
       </div>
     </section>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { MdPreview } from 'md-editor-v3'
 import api from '../utils/api'
 
 export default {
-  name: 'MedicalAdvice',
+  name: 'TravelPlanning',
   components: {
     MdPreview
   },
@@ -89,11 +61,28 @@ export default {
     const description = ref('')
     const loading = ref(false)
     const currentAdvice = ref('')
-    const history = ref([])
+    const elapsedSeconds = ref(0)
+    let timerId = null
+
+    const startTimer = () => {
+      elapsedSeconds.value = 0
+      if (timerId) clearInterval(timerId)
+      timerId = setInterval(() => {
+        elapsedSeconds.value += 1
+      }, 1000)
+    }
+
+    const stopTimer = () => {
+      if (timerId) {
+        clearInterval(timerId)
+        timerId = null
+      }
+    }
 
     const submitAdvice = async () => {
       if (!description.value.trim() || loading.value) return
       loading.value = true
+      startTimer()
       try {
         const payload = { description: description.value.trim() }
         const response = await api.post('/AI/agent/medical_advice', payload)
@@ -101,11 +90,6 @@ export default {
         if (response.data && response.data.status_code === 1000) {
           const advice = response.data.advice || '暂无建议'
           currentAdvice.value = advice
-          history.value.unshift({
-            description: payload.description,
-            advice,
-            time: new Date().toLocaleString()
-          })
           description.value = ''
         } else {
           const message = response.data?.status_msg || '生成失败，请稍后再试'
@@ -115,31 +99,30 @@ export default {
         ElMessage.error(error?.response?.data?.status_msg || '无法连接到服务器')
       } finally {
         loading.value = false
+        stopTimer()
       }
     }
 
-    const clearHistory = () => {
-      history.value = []
-    }
+    onUnmounted(() => {
+      stopTimer()
+    })
 
     return {
       description,
       loading,
       currentAdvice,
-      history,
-      submitAdvice,
-      clearHistory
+      elapsedSeconds,
+      submitAdvice
     }
   }
 }
 </script>
 
 <style scoped>
-.medical-advice-page {
+.travel-planning-page {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: minmax(320px, 2fr) minmax(260px, 1fr);
-  gap: 28px;
+  display: flex;
+  justify-content: center;
   padding: 48px 6vw 64px;
 }
 
@@ -154,12 +137,12 @@ export default {
   margin: 6px 0 8px;
 }
 
-.input-panel,
-.history-panel {
+.input-panel {
   padding: 36px;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  width: min(920px, 100%);
 }
 
 .back-btn {
@@ -198,8 +181,9 @@ textarea:focus {
 
 .actions {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .primary-btn,
@@ -226,14 +210,6 @@ textarea:focus {
   color: var(--text-color);
 }
 
-.disclaimer {
-  font-size: 13px;
-  color: #b45309;
-  background: rgba(251, 191, 36, 0.2);
-  padding: 10px 12px;
-  border-radius: 12px;
-}
-
 .result-card {
   border: 1px solid rgba(99, 102, 241, 0.2);
   border-radius: var(--radius-lg);
@@ -249,42 +225,11 @@ textarea:focus {
   color: var(--text-muted);
 }
 
-.history-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.history-list li {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.history-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
-}
-
-.history-meta strong {
-  font-size: 14px;
-  color: var(--primary-dark);
-}
-
-.history-meta span {
-  font-size: 15px;
-  color: var(--text-color);
-}
-
-@media (max-width: 900px) {
-  .medical-advice-page {
-    grid-template-columns: 1fr;
-  }
+.timer {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: rgba(15, 23, 42, 0.06);
+  padding: 8px 12px;
+  border-radius: 999px;
 }
 </style>
