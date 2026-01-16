@@ -31,7 +31,7 @@ func (o *OpenAIModel) NewFlightAdvisorAgent(ctx context.Context, tools []tool.Ba
 	a, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "FlightAdvisor",
 		Description: "推荐机票选择并评估价格区间",
-		Instruction: "你是机票推荐与价格评估助手。根据行程时间与出发/到达城市，给出航班选择建议、价格区间判断、购票时机与省钱策略，避免虚构具体航班号。",
+		Instruction: "你是机票推荐与价格评估助手。根据行程时间与出发/到达城市，给出航班选择建议、价格区间判断、购票时机与省钱策略，避免虚构具体航班号。将航班的来源以引用的方式附加在回答的最后。",
 		Model:       o.llm,
 		ToolsConfig: adk.ToolsConfig{
 			ToolsNodeConfig: compose.ToolsNodeConfig{Tools: tools},
