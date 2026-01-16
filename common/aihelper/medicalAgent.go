@@ -20,6 +20,7 @@ const medicalRedFlagNoticePath = "common/tools/prompt/medical_red_flag_notice.tx
 const medicalNoRedFlagNoticePath = "common/tools/prompt/medical_no_red_flag_notice.txt"
 const medicalSummaryPromptPath = "common/tools/prompt/medical_summary_prompt.txt"
 const myBaseURL = "http://localhost:8081/sse"
+const flightBaseURL = "http://localhost:8082/sse"
 
 type ModelJudgment struct {
 	IsRedFlag   bool   `json:"red_flag"`
@@ -112,6 +113,16 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		log.Printf("ERROR getting MCP tools: %v\n", err)
 		return nil, err
 	}
+	flightCli, err := initMCPClient(ctx, flightBaseURL)
+	if err != nil {
+		log.Printf("ERROR initializing flight MCP client: %v\n", err)
+		return nil, err
+	}
+	flightTools, err := mcp.GetTools(ctx, &mcp.Config{Cli: flightCli})
+	if err != nil {
+		log.Printf("ERROR getting flight MCP tools: %v\n", err)
+		return nil, err
+	}
 	red_flag_agent, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "TravelFeasibilityAdvisor",
 		Description: "旅游行程可行性评估与需求完善助手",
@@ -142,7 +153,7 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		log.Printf("ERROR creating overall route planner: %v\n", err)
 		return nil, err
 	}
-	flightPlanner, err := o.NewFlightAdvisorAgent(ctx, tools)
+	flightPlanner, err := o.NewFlightAdvisorAgent(ctx, flightTools)
 	if err != nil {
 		log.Printf("ERROR creating flight planner: %v\n", err)
 		return nil, err

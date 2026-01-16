@@ -46,6 +46,7 @@ GopherAI 是一个基于 Go + Vue3 的 AI 旅行规划服务平台，聚合了�
 | Redis | `6380` | 验证码、缓存等 | `config/config.toml` → `[redisConfig] port` |
 | RabbitMQ | `5672` | 异步消息/任务队列 | `config/config.toml` → `[rabbitmqConfig] port` |
 | MCP 工具服务 | `8081` | SSE 工具服务，URL: `http://localhost:8081/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
+| MCP Flight 工具服务 | `8082` | Google Flights 查询工具，URL: `http://localhost:8082/sse` | `common/aihelper/medicalAgent.go` → `flightBaseURL` |
 
 ## 📁 主要目录
 
@@ -99,6 +100,21 @@ cd common/tools/mcp/eino-mcp/tools/mcp-time
 go build -o mcp-time main.go
 ./mcp-time -transport=sse -server_listen=localhost:8081
 ```
+
+Google Flights MCP 工具服务（基于 SerpAPI）：
+
+```bash
+export SERPAPI_API_KEY=your_api_key
+cd common/tools/mcp/eino-mcp/tools/mcp-flight
+go build -o mcp-flight main.go
+./mcp-flight -transport=sse -server_listen=localhost:8082
+```
+
+MCP 工具服务相关环境变量：
+
+- `GOOGLE_API_KEY`：Google Search 工具（`mcp-time` 内的 `google_search`）所需 API Key
+- `GOOGLE_SEARCH_ENGINE_ID`：Google Search 工具（`mcp-time` 内的 `google_search`）所需自定义搜索引擎 ID
+- `SERPAPI_API_KEY`：Google Flights 工具（`mcp-flight`）所需的 SerpAPI Key
 
 前端：
 
