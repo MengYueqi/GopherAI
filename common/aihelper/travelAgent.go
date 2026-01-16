@@ -49,7 +49,7 @@ func (o *OpenAIModel) NewAttractionHighlightsAgent(ctx context.Context, tools []
 	a, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "DailyItineraryBuilder",
 		Description: "生成重要景点介绍",
-		Instruction: "你是重要景点介绍助手。根据目的地与用户偏好，精选关键景点在特定的部分进行介绍。介绍要尽量详细，包含历史背景、文化意义和独特体验，帮助用户了解景点亮点。",
+		Instruction: "你是重要景点介绍助手。根据目的地与用户偏好，精选关键景点在特定的部分进行介绍。介绍要尽量详细，包含历史背景、文化意义和独特体验，帮助用户了解景点亮点。如果调用了检索工具，请将信息来源附加在回答的最后。",
 		Model:       o.llm,
 		ToolsConfig: adk.ToolsConfig{
 			ToolsNodeConfig: compose.ToolsNodeConfig{Tools: tools},
