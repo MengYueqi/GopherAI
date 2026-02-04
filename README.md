@@ -70,6 +70,8 @@ flowchart TD
 | Vue 前端 DevServer | `8080` | `vue-cli-service serve` 默认访问地址 | `vue-frontend/vue.config.js` |
 | MySQL | `3307` | 主业务数据库 `GopherAI` | `config/config.toml` → `[mysqlConfig] port` |
 | Redis | `6380` | 验证码、缓存等 | `config/config.toml` → `[redisConfig] port` |
+| Redis Vector (Redis Stack) | `6381` | RAG 向量检索存储 | `common/rag/redis_docker_init.sh` |
+| Redis Stack UI | `8002` | Redis Stack Web UI | `common/rag/redis_docker_init.sh` |
 | RabbitMQ | `5672` | 异步消息/任务队列 | `config/config.toml` → `[rabbitmqConfig] port` |
 | MCP 工具服务 | `8081` | SSE 工具服务，URL: `http://localhost:8081/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
 | MCP Flight 工具服务 | `8082` | Google Flights 查询工具，URL: `http://localhost:8082/sse` | `common/aihelper/medicalAgent.go` → `flightBaseURL` |
@@ -88,6 +90,26 @@ flowchart TD
 2. 在 `config/env.sh` 中写入 DashScope（Qwen-Plus）兼容接口所需的 `OPENAI_API_KEY`、`OPENAI_BASE_URL_ALIYUN`、`OPENAI_MODEL_NAME`，运行前执行 `source config/env.sh`。
 3. 如果需要本地 ONNX 推理，确保安装 ONNXRuntime 依赖，并设置 `config/env.sh` 中的 `LD_LIBRARY_PATH`。
 4. 保证上表列出的端口未被占用，或在配置文件中调整后同步更新 README。
+
+## 🧠 RAG Redis 向量数据库
+
+RAG 数据库功能基于 Redis Stack（支持向量索引），用于存储与检索向量化数据。请分别执行以下两步：先启动容器，再在 Redis CLI 中创建向量索引。
+
+1) 启动 Redis Stack 容器（终端执行）：
+
+```bash
+docker run -d \
+  --name redis-vector-6381 \
+  -p 6381:6379 \
+  -p 8002:8001 \
+  redis/redis-stack:latest
+```
+
+2) 创建向量索引（Redis CLI 中执行）：
+
+```bash
+FT.CREATE idx:rag_data ON HASH PREFIX 1 rag:data: SCHEMA content TEXT embedding VECTOR HNSW 6 TYPE FLOAT32 DIM 768 DISTANCE_METRIC COSINE
+```
 
 ## 🛠 能力开关示例
 
