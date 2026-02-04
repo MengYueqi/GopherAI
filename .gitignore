@@ -35,4 +35,4 @@ config.toml
 env.sh
 
 # Test Dir
-test/
+# test/
