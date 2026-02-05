@@ -73,8 +73,9 @@ flowchart TD
 | Redis Vector (Redis Stack) | `6381` | RAG 向量检索存储 | `common/rag/redis_docker_init.sh` |
 | Redis Stack UI | `8002` | Redis Stack Web UI | `common/rag/redis_docker_init.sh` |
 | RabbitMQ | `5672` | 异步消息/任务队列 | `config/config.toml` → `[rabbitmqConfig] port` |
-| MCP 工具服务 | `8081` | SSE 工具服务，URL: `http://localhost:8081/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
+| MCP 工具服务（Time/Search） | `8081` | SSE 工具服务，URL: `http://localhost:8081/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
 | MCP Flight 工具服务 | `8082` | Google Flights 查询工具，URL: `http://localhost:8082/sse` | `common/aihelper/medicalAgent.go` → `flightBaseURL` |
+| MCP Chatbox 工具服务 | `8083` | SSE 工具服务，URL: `http://localhost:8083/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
 
 ## 📁 主要目录
 
@@ -156,6 +157,14 @@ export SERPAPI_API_KEY=your_api_key
 cd common/tools/mcp/eino-mcp/tools/mcp-flight
 go build -o mcp-flight main.go
 ./mcp-flight -transport=sse -server_listen=localhost:8082
+```
+
+Chatbox MCP 工具服务：
+
+```bash
+cd common/tools/mcp/eino-mcp/tools/mcp-chatbox
+go build -o mcp-chatbox main.go
+./mcp-chatbox -transport=sse -server_listen=localhost:8083
 ```
 
 MCP 工具服务相关环境变量：

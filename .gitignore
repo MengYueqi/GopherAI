@@ -34,5 +34,6 @@ coverage/
 config.toml
 env.sh
 
-# Test Dir
-# test/
+# Data
+data/*.jsonl
+data/*.json

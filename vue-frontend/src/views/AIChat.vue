@@ -56,7 +56,7 @@
               <small>实时输出</small>
             </span>
           </button>
-          <button
+          <!-- <button
             type="button"
             class="chip-toggle"
             :class="{ active: isUsingGoogle }"
@@ -67,8 +67,8 @@
               <strong>使用 Google</strong>
               <small>{{ isUsingGoogle ? '已启用' : '未启用' }}</small>
             </span>
-          </button>
-          <button
+          </button> -->
+          <!-- <button
             type="button"
             class="chip-toggle"
             :class="{ active: isUsingRAG }"
@@ -79,7 +79,7 @@
               <strong>行程增强</strong>
               <small>{{ isUsingRAG ? 'RAG 检索' : '默认模式' }}</small>
             </span>
-          </button>
+          </button> -->
         </div>
       </div>
 

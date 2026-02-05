@@ -10,6 +10,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -28,8 +29,9 @@ type OllamaConfig struct {
 }
 
 type RAGDatabase interface {
-	AddOneData(ctx context.Context, content string) error                // 向数据库添加一条消息
-	GetEmbedding(ctx context.Context, content string) ([]float32, error) // 获取内容的向量表示
+	AddOneData(ctx context.Context, content string) error                          // 向数据库添加一条消息
+	GetEmbedding(ctx context.Context, content string) ([]float32, error)           // 获取内容的向量表示
+	GetKNN(ctx context.Context, content string, k int) ([]*RagReturnedData, error) // 基于向量检索K条相似内容
 }
 
 type RedisRAG struct {
@@ -44,6 +46,11 @@ type OllamaResponseBody struct {
 type OllamaRequestBody struct {
 	Model  string `json:"model"`
 	Prompt string `json:"prompt"`
+}
+
+type RagReturnedData struct {
+	Content string
+	Score   float64
 }
 
 func InitRedisRAG(redisConfig RedisConfig, ollamaConfig OllamaConfig) *RedisRAG {
@@ -96,6 +103,7 @@ func float32SliceToBytes(values []float32) []byte {
 	}
 	return buf
 }
+
 func (redisRag *RedisRAG) GetEmbedding(ctx context.Context, content string) ([]float32, error) {
 	if strings.TrimSpace(content) == "" {
 		return nil, fmt.Errorf("content is empty")
@@ -159,4 +167,76 @@ func (redisRag *RedisRAG) GetEmbedding(ctx context.Context, content string) ([]f
 	log.Println("Origin Word: ", content, " Received embedding:", respBody.Embedding)
 
 	return respBody.Embedding, nil
+}
+
+func (redisRag *RedisRAG) GetKNN(ctx context.Context, content string, k int) ([]*RagReturnedData, error) {
+	if strings.TrimSpace(content) == "" {
+		return nil, fmt.Errorf("content is empty")
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	// 获取内容的向量表示
+	embedding, err := redisRag.GetEmbedding(ctx, content)
+	if err != nil {
+		return nil, err
+	}
+	vectorBytes := float32SliceToBytes(embedding)
+
+	// 构造 KNN 查询命令
+	query := fmt.Sprintf("*=>[KNN %d @embedding $vec AS vector_score]", k)
+
+	// 执行查询
+	res, err := redisRag.RedisClient.Do(ctx, "FT.SEARCH", "idx:rag_data", query,
+		"PARAMS", 2, "vec", vectorBytes,
+		"SORTBY", "vector_score", "ASC",
+		"RETURN", "1", "content",
+		"DIALECT", "2",
+	).Result()
+	if err != nil {
+		return nil, fmt.Errorf("execute KNN search failed: %w", err)
+	}
+
+	// 解析结果
+	results, ok := res.([]interface{})
+	if !ok || len(results) < 1 {
+		return []*RagReturnedData{}, nil
+	}
+	numResults, ok := results[0].(int64)
+	if !ok || numResults == 0 {
+		return []*RagReturnedData{}, nil
+	}
+
+	var ragResults []*RagReturnedData
+	for i := 1; i < len(results); i += 2 {
+		// 每条结果包含 ID 和字段列表
+		fields, ok := results[i+1].([]interface{})
+		if !ok || len(fields) < 2 {
+			continue
+		}
+		var content string
+		var score float64
+		// 解析字段列表
+		for j := 0; j < len(fields); j += 2 {
+			fieldName, _ := fields[j].(string)
+			fieldValue := fields[j+1]
+			if fieldName == "content" {
+				content, _ = fieldValue.(string)
+			} else if fieldName == "vector_score" {
+				switch v := fieldValue.(type) {
+				case string:
+					score, _ = strconv.ParseFloat(v, 64)
+				case float64:
+					score = v
+				}
+			}
+		}
+		ragResults = append(ragResults, &RagReturnedData{
+			Content: content,
+			Score:   score,
+		})
+	}
+
+	return ragResults, nil
 }
