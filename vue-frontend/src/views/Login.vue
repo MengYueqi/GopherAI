@@ -1,8 +1,5 @@
 <template>
   <div class="auth-page login-page">
-    <span class="blob blob-one"></span>
-    <span class="blob blob-two"></span>
-
     <div class="auth-grid">
       <section class="auth-hero glass-panel">
         <span class="pill">GopherAI Suite</span>
@@ -35,20 +32,6 @@
         <div class="card-header">
           <h2>登录账户</h2>
           <p>输入账号信息，继续探索 AI 能力。</p>
-        </div>
-        <div class="card-info-list">
-          <div class="card-info-item">
-            <strong>99.9%</strong>
-            <span>服务可用性</span>
-          </div>
-          <div class="card-info-item">
-            <strong>24/7</strong>
-            <span>风控守护</span>
-          </div>
-          <div class="card-info-item">
-            <strong>TLS</strong>
-            <span>链路加密</span>
-          </div>
         </div>
         <el-form
           ref="loginFormRef"
@@ -177,27 +160,6 @@ export default {
 </script>
 
 <style scoped>
-.blob {
-  position: absolute;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.45;
-}
-
-.blob-one {
-  top: 5%;
-  right: 12%;
-  background: #c4b5fd;
-}
-
-.blob-two {
-  bottom: 8%;
-  left: 8%;
-  background: #5eead4;
-}
-
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -205,7 +167,7 @@ export default {
   justify-content: center;
   padding: 60px 5vw;
   position: relative;
-  overflow: hidden;
+  background: #f8fafc;
 }
 
 .auth-grid {
@@ -220,32 +182,34 @@ export default {
 .auth-hero {
   padding: 48px;
   color: #fff;
-  background: linear-gradient(140deg, rgba(20, 18, 50, 0.95), rgba(62, 66, 168, 0.95));
+  background: #1e1b4b;
   position: relative;
-  overflow: hidden;
 }
 
-.auth-hero::after {
-  content: '';
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.35), transparent 70%);
-  right: -40px;
-  top: -30px;
+.auth-hero .pill {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .auth-hero h1 {
-  font-size: 36px;
-  line-height: 1.2;
-  margin: 20px 0 16px;
+  font-size: 38px;
+  line-height: 1.25;
+  margin: 24px 0 18px;
   font-weight: 700;
+  color: #fff;
 }
 
 .auth-hero p {
-  color: rgba(255, 255, 255, 0.75);
-  margin-bottom: 28px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 32px;
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .auth-highlights {
@@ -253,33 +217,49 @@ export default {
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .auth-highlights li {
-  padding: 18px;
-  border-radius: 16px;
+  padding: 20px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background 0.2s ease;
+}
+
+.auth-highlights li:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .auth-highlights strong {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 16px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.auth-highlights strong::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8b5cf6;
 }
 
 .auth-highlights span {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 14px;
+  padding-left: 18px;
 }
 
 .auth-card {
-  padding: 30px 30px 28px;
-  border-radius: 24px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(249, 250, 255, 0.92));
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  padding: 36px 36px 32px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
 }
 
 .card-topline {
@@ -287,12 +267,12 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
   color: #334155;
-  background: rgba(15, 23, 42, 0.06);
+  background: #f1f5f9;
 }
 
 .status-dot {
@@ -300,54 +280,29 @@ export default {
   height: 8px;
   border-radius: 50%;
   background: #16a34a;
-  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
 }
 
 .card-header {
-  margin-bottom: 18px;
+  margin-bottom: 28px;
 }
 
 .card-header h2 {
   margin: 0;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
+  color: #1e293b;
 }
 
 .card-header p {
-  margin: 8px 0 0;
-  color: var(--text-muted);
-}
-
-.card-info-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.card-info-item {
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.12);
-}
-
-.card-info-item strong {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-  color: #3730a3;
-}
-
-.card-info-item span {
-  font-size: 12px;
-  color: #6366f1;
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 15px;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .el-form-item {
@@ -356,21 +311,26 @@ export default {
 
 .el-form-item :deep(.el-form-item__label) {
   font-weight: 600;
-  color: var(--text-color);
+  font-size: 14px;
+  color: #334155;
+  padding-bottom: 8px;
 }
 
 .el-input :deep(.el-input__wrapper) {
-  border-radius: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0 14px;
-  box-shadow: inset 0 0 0 1px transparent;
-  transition: all 0.2s ease;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  padding: 4px 16px;
+  transition: border-color 0.2s ease;
+  height: 48px;
+}
+
+.el-input :deep(.el-input__inner) {
+  font-size: 15px;
 }
 
 .el-input :deep(.el-input__wrapper.is-focus) {
-  border-color: rgba(112, 100, 255, 0.85);
-  box-shadow: 0 0 0 3px rgba(112, 100, 255, 0.2);
+  border-color: #6366f1;
 }
 
 .form-meta {
@@ -400,16 +360,18 @@ export default {
 
 .submit-btn {
   width: 100%;
-  height: 50px;
-  border-radius: 18px;
+  height: 54px;
+  border-radius: 12px;
   font-size: 16px;
-  margin-top: 4px;
-  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  font-weight: 600;
+  margin-top: 8px;
+  background: #6366f1;
   border: none;
+  transition: background 0.2s ease;
 }
 
 .submit-btn:hover {
-  filter: brightness(1.05);
+  background: #4f46e5;
 }
 
 .divider-text {
@@ -468,11 +430,7 @@ export default {
   }
 
   .auth-card {
-    padding: 24px 20px;
-  }
-
-  .card-info-list {
-    grid-template-columns: 1fr;
+    padding: 28px 24px;
   }
 }
 </style>
