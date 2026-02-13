@@ -28,9 +28,27 @@
       </section>
 
       <el-card class="auth-card glass-panel" shadow="never">
+        <div class="card-topline">
+          <span class="status-dot"></span>
+          <span>企业级安全登录</span>
+        </div>
         <div class="card-header">
           <h2>登录账户</h2>
           <p>输入账号信息，继续探索 AI 能力。</p>
+        </div>
+        <div class="card-info-list">
+          <div class="card-info-item">
+            <strong>99.9%</strong>
+            <span>服务可用性</span>
+          </div>
+          <div class="card-info-item">
+            <strong>24/7</strong>
+            <span>风控守护</span>
+          </div>
+          <div class="card-info-item">
+            <strong>TLS</strong>
+            <span>链路加密</span>
+          </div>
         </div>
         <el-form
           ref="loginFormRef"
@@ -51,10 +69,17 @@
               placeholder="请输入密码"
               type="password"
               show-password
+              @keyup.enter="handleLogin"
             />
           </el-form-item>
+          <div class="form-options">
+            <el-checkbox v-model="rememberMe">记住我</el-checkbox>
+            <button type="button" class="link-btn subtle-link" @click="handleForgotPassword">
+              忘记密码
+            </button>
+          </div>
           <div class="form-meta">
-            <span>账号受企业级安全保护</span>
+            <span>登录即代表你同意平台的安全策略与服务条款</span>
           </div>
           <el-button
             type="primary"
@@ -62,8 +87,9 @@
             @click="handleLogin"
             class="submit-btn"
           >
-            登录
+            {{ loading ? '登录中...' : '立即登录' }}
           </el-button>
+          <div class="divider-text">或</div>
           <div class="form-footer">
             <span>还没有账号？</span>
             <button type="button" class="link-btn" @click="$router.push('/register')">
@@ -88,8 +114,10 @@ export default {
     const router = useRouter()
     const loginFormRef = ref()
     const loading = ref(false)
+    const savedUsername = localStorage.getItem('saved_username') || ''
+    const rememberMe = ref(Boolean(savedUsername))
     const loginForm = ref({
-      username: '',
+      username: savedUsername,
       password: ''
     })
 
@@ -113,6 +141,11 @@ export default {
         })
         if (response.data.status_code === 1000) {
           localStorage.setItem('token', response.data.token)
+          if (rememberMe.value) {
+            localStorage.setItem('saved_username', loginForm.value.username)
+          } else {
+            localStorage.removeItem('saved_username')
+          }
           ElMessage.success('登录成功')
           router.push('/menu')
         } else {
@@ -126,14 +159,20 @@ export default {
       }
     }
 
+    const handleForgotPassword = () => {
+      ElMessage.info('请联系管理员重置密码')
+    }
+
     return {
       loginFormRef,
       loading,
+      rememberMe,
       loginForm,
       loginRules,
-      handleLogin
+      handleLogin,
+      handleForgotPassword
     }
-}
+  }
 }
 </script>
 
@@ -236,11 +275,36 @@ export default {
 }
 
 .auth-card {
-  padding: 36px 32px 32px;
+  padding: 30px 30px 28px;
+  border-radius: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(249, 250, 255, 0.92));
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.card-topline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
 }
 
 .card-header {
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 }
 
 .card-header h2 {
@@ -251,6 +315,33 @@ export default {
 
 .card-header p {
   margin: 8px 0 0;
+  color: var(--text-muted);
+}
+
+.card-info-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.card-info-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+}
+
+.card-info-item strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #3730a3;
+}
+
+.card-info-item span {
+  font-size: 12px;
+  color: #6366f1;
 }
 
 .login-form {
@@ -285,6 +376,26 @@ export default {
 .form-meta {
   font-size: 13px;
   color: var(--text-muted);
+  margin-top: -4px;
+}
+
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -6px;
+}
+
+.form-options :deep(.el-checkbox__label) {
+  color: #475569;
+}
+
+.subtle-link {
+  color: #64748b;
+}
+
+.subtle-link:hover {
+  color: #475569;
 }
 
 .submit-btn {
@@ -292,6 +403,38 @@ export default {
   height: 50px;
   border-radius: 18px;
   font-size: 16px;
+  margin-top: 4px;
+  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  border: none;
+}
+
+.submit-btn:hover {
+  filter: brightness(1.05);
+}
+
+.divider-text {
+  text-align: center;
+  font-size: 12px;
+  color: #94a3b8;
+  position: relative;
+}
+
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 20px);
+  height: 1px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.divider-text::before {
+  left: 0;
+}
+
+.divider-text::after {
+  right: 0;
 }
 
 .form-footer {
@@ -322,6 +465,14 @@ export default {
 
   .auth-page {
     padding: 40px 16px;
+  }
+
+  .auth-card {
+    padding: 24px 20px;
+  }
+
+  .card-info-list {
+    grid-template-columns: 1fr;
   }
 }
 </style>
