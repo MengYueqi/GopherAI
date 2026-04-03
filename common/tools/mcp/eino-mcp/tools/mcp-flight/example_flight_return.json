@@ -1,0 +1,1218 @@
+{
+    "search_metadata": {
+        "id": "6969a7622f47f88a035be80b",
+        "status": "Success",
+        "json_endpoint": "https://serpapi.com/searches/34bbecd49e8bdd61/6969a7622f47f88a035be80b.json",
+        "created_at": "2026-01-16 02:50:10 UTC",
+        "processed_at": "2026-01-16 02:50:10 UTC",
+        "google_flights_url": "https://www.google.com/travel/flights?hl=en&gl=us&curr=USD&tfs=CBwQAhoeEgoyMDI2LTAzLTAzagcIARIDQ0RHcgcIARIDQVVTQgEBSAFwAZgBAg&tfu=EgIIAQ",
+        "raw_html_file": "https://serpapi.com/searches/34bbecd49e8bdd61/6969a7622f47f88a035be80b.html",
+        "prettify_html_file": "https://serpapi.com/searches/34bbecd49e8bdd61/6969a7622f47f88a035be80b.prettify",
+        "total_time_taken": 1.33
+    },
+    "search_parameters": {
+        "engine": "google_flights",
+        "hl": "en",
+        "gl": "us",
+        "type": "2",
+        "departure_id": "CDG",
+        "arrival_id": "AUS",
+        "outbound_date": "2026-03-03",
+        "currency": "USD"
+    },
+    "best_flights": [
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 10:10"
+                    },
+                    "arrival_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2026-03-03 10:40"
+                    },
+                    "duration": 90,
+                    "airplane": "Airbus A319",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 301",
+                    "ticket_also_sold_by": [
+                        "American"
+                    ],
+                    "legroom": "29 in",
+                    "extensions": [
+                        "Below average legroom (29 in)",
+                        "In-seat USB outlet",
+                        "Carbon emissions estimate: 63 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2026-03-03 12:10"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 16:50"
+                    },
+                    "duration": 640,
+                    "airplane": "Airbus A350",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 191",
+                    "ticket_also_sold_by": [
+                        "American",
+                        "Finnair",
+                        "Iberia"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 461 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 90,
+                    "name": "Heathrow Airport",
+                    "id": "LHR"
+                }
+            ],
+            "total_duration": 820,
+            "carbon_emissions": {
+                "this_flight": 525000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 0
+            },
+            "price": 864,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3RDUVRNd01YeENRVEU1TVJvTENOK2lCUkFDR2dOVlUwUTRISERmb2dVPSIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIkxIUiIsbnVsbCwiQkEiLCIzMDEiXSxbIkxIUiIsIjIwMjYtMDMtMDMiLCJBVVMiLG51bGwsIkJBIiwiMTkxIl1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 11:05"
+                    },
+                    "arrival_airport": {
+                        "name": "Dallas Fort Worth International Airport",
+                        "id": "DFW",
+                        "time": "2026-03-03 14:45"
+                    },
+                    "duration": 640,
+                    "airplane": "Boeing 787",
+                    "airline": "American",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AA 49",
+                    "ticket_also_sold_by": [
+                        "Finnair"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 408 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Dallas Fort Worth International Airport",
+                        "id": "DFW",
+                        "time": "2026-03-03 16:39"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 17:47"
+                    },
+                    "duration": 68,
+                    "airplane": "Airbus A319",
+                    "airline": "American",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AA 2458",
+                    "ticket_also_sold_by": [
+                        "Finnair"
+                    ],
+                    "legroom": "30 in",
+                    "extensions": [
+                        "Average legroom (30 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power outlet",
+                        "Stream media to your device",
+                        "Carbon emissions estimate: 65 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 114,
+                    "name": "Dallas Fort Worth International Airport",
+                    "id": "DFW"
+                }
+            ],
+            "total_duration": 822,
+            "carbon_emissions": {
+                "this_flight": 474000,
+                "typical_for_this_route": 523000,
+                "difference_percent": -9
+            },
+            "price": 868,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3RCUVRRNWZFRkJNalExT0JvTENMMmxCUkFDR2dOVlUwUTRISEM5cFFVPSIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIkRGVyIsbnVsbCwiQUEiLCI0OSJdLFsiREZXIiwiMjAyNi0wMy0wMyIsIkFVUyIsbnVsbCwiQUEiLCIyNDU4Il1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 11:55"
+                    },
+                    "arrival_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2026-03-03 12:25"
+                    },
+                    "duration": 90,
+                    "airplane": "Airbus A320",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 303",
+                    "ticket_also_sold_by": [
+                        "American"
+                    ],
+                    "legroom": "29 in",
+                    "extensions": [
+                        "Below average legroom (29 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "Carbon emissions estimate: 55 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                },
+                {
+                    "departure_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2026-03-03 14:45"
+                    },
+                    "arrival_airport": {
+                        "name": "Dallas Fort Worth International Airport",
+                        "id": "DFW",
+                        "time": "2026-03-03 19:10"
+                    },
+                    "duration": 625,
+                    "airplane": "Airbus A350",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 193",
+                    "ticket_also_sold_by": [
+                        "American",
+                        "Finnair"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 393 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                },
+                {
+                    "departure_airport": {
+                        "name": "Dallas Fort Worth International Airport",
+                        "id": "DFW",
+                        "time": "2026-03-03 20:56"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 22:05"
+                    },
+                    "duration": 69,
+                    "airplane": "Airbus A321",
+                    "airline": "American",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AA 3242",
+                    "ticket_also_sold_by": [
+                        "British Airways"
+                    ],
+                    "legroom": "30 in",
+                    "extensions": [
+                        "Average legroom (30 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "Stream media to your device",
+                        "Carbon emissions estimate: 59 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 140,
+                    "name": "Heathrow Airport",
+                    "id": "LHR"
+                },
+                {
+                    "duration": 106,
+                    "name": "Dallas Fort Worth International Airport",
+                    "id": "DFW"
+                }
+            ],
+            "total_duration": 1030,
+            "carbon_emissions": {
+                "this_flight": 508000,
+                "typical_for_this_route": 523000,
+                "difference_percent": -3
+            },
+            "price": 870,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFaEpDUVRNd00zeENRVEU1TTN4QlFUTXlORElhQ3dpTnB3VVFBaG9EVlZORU9CeHdqYWNGIixbWyJDREciLCIyMDI2LTAzLTAzIiwiTEhSIixudWxsLCJCQSIsIjMwMyJdLFsiTEhSIiwiMjAyNi0wMy0wMyIsIkRGVyIsbnVsbCwiQkEiLCIxOTMiXSxbIkRGVyIsIjIwMjYtMDMtMDMiLCJBVVMiLG51bGwsIkFBIiwiMzI0MiJdXV0="
+        }
+    ],
+    "other_flights": [
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 13:00"
+                    },
+                    "arrival_airport": {
+                        "name": "Keflavík International Airport",
+                        "id": "KEF",
+                        "time": "2026-03-03 15:40"
+                    },
+                    "duration": 220,
+                    "airplane": "Boeing 767",
+                    "airline": "Icelandair",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/FI.png",
+                    "travel_class": "Economy",
+                    "flight_number": "FI 543",
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 166 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Keflavík International Airport",
+                        "id": "KEF",
+                        "time": "2026-03-04 17:00"
+                    },
+                    "arrival_airport": {
+                        "name": "Boston Logan International Airport",
+                        "id": "BOS",
+                        "time": "2026-03-04 17:50"
+                    },
+                    "duration": 350,
+                    "airplane": "Boeing 767",
+                    "airline": "Icelandair",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/FI.png",
+                    "travel_class": "Economy",
+                    "flight_number": "FI 631",
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 280 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Boston Logan International Airport",
+                        "id": "BOS",
+                        "time": "2026-03-05 12:55"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-05 16:44"
+                    },
+                    "duration": 289,
+                    "airplane": "Airbus A320",
+                    "airline": "JetBlue",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/B6.png",
+                    "travel_class": "Economy",
+                    "flight_number": "B6 1039",
+                    "legroom": "32 in",
+                    "extensions": [
+                        "Above average legroom (32 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "Live TV",
+                        "Carbon emissions estimate: 249 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 1520,
+                    "name": "Keflavík International Airport",
+                    "id": "KEF",
+                    "overnight": true
+                },
+                {
+                    "duration": 1145,
+                    "name": "Boston Logan International Airport",
+                    "id": "BOS",
+                    "overnight": true
+                }
+            ],
+            "total_duration": 3524,
+            "carbon_emissions": {
+                "this_flight": 696000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 33
+            },
+            "price": 810,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
+            "extensions": [
+                "1 checked bag up to 23 kg included",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFaEpHU1RVME0zeEdTVFl6TVh4Q05qRXdNemthQ3dqVitBUVFBaG9EVlZORU9CeHcxZmdFIixbWyJDREciLCIyMDI2LTAzLTAzIiwiS0VGIixudWxsLCJGSSIsIjU0MyJdLFsiS0VGIiwiMjAyNi0wMy0wNCIsIkJPUyIsbnVsbCwiRkkiLCI2MzEiXSxbIkJPUyIsIjIwMjYtMDMtMDUiLCJBVVMiLG51bGwsIkI2IiwiMTAzOSJdXV0="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 11:25"
+                    },
+                    "arrival_airport": {
+                        "name": "Miami International Airport",
+                        "id": "MIA",
+                        "time": "2026-03-03 15:30"
+                    },
+                    "duration": 605,
+                    "airplane": "Boeing 787",
+                    "airline": "American",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AA 63",
+                    "ticket_also_sold_by": [
+                        "Iberia"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 460 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Miami International Airport",
+                        "id": "MIA",
+                        "time": "2026-03-03 19:00"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 21:24"
+                    },
+                    "duration": 204,
+                    "airplane": "Boeing 737",
+                    "airline": "American",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AA 2629",
+                    "ticket_also_sold_by": [
+                        "Iberia"
+                    ],
+                    "legroom": "30 in",
+                    "extensions": [
+                        "Average legroom (30 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "Stream media to your device",
+                        "Carbon emissions estimate: 158 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 210,
+                    "name": "Miami International Airport",
+                    "id": "MIA"
+                }
+            ],
+            "total_duration": 1019,
+            "carbon_emissions": {
+                "this_flight": 620000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 19
+            },
+            "price": 873,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3RCUVRZemZFRkJNall5T1JvTENJS3FCUkFDR2dOVlUwUTRISENDcWdVPSIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIk1JQSIsbnVsbCwiQUEiLCI2MyJdLFsiTUlBIiwiMjAyNi0wMy0wMyIsIkFVUyIsbnVsbCwiQUEiLCIyNjI5Il1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 13:30"
+                    },
+                    "arrival_airport": {
+                        "name": "Philadelphia International Airport",
+                        "id": "PHL",
+                        "time": "2026-03-03 15:45"
+                    },
+                    "duration": 495,
+                    "airplane": "Boeing 787",
+                    "airline": "American",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AA 755",
+                    "ticket_also_sold_by": [
+                        "Iberia"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 462 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Philadelphia International Airport",
+                        "id": "PHL",
+                        "time": "2026-03-03 18:50"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 21:56"
+                    },
+                    "duration": 246,
+                    "airplane": "Airbus A319",
+                    "airline": "American",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AA 1394",
+                    "ticket_also_sold_by": [
+                        "Iberia"
+                    ],
+                    "legroom": "30 in",
+                    "extensions": [
+                        "Average legroom (30 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power outlet",
+                        "Stream media to your device",
+                        "Carbon emissions estimate: 236 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 185,
+                    "name": "Philadelphia International Airport",
+                    "id": "PHL"
+                }
+            ],
+            "total_duration": 926,
+            "carbon_emissions": {
+                "this_flight": 699000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 34
+            },
+            "price": 873,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AA.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3hCUVRjMU5YeEJRVEV6T1RRYUN3aUNxZ1VRQWhvRFZWTkVPQnh3Z3FvRiIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIlBITCIsbnVsbCwiQUEiLCI3NTUiXSxbIlBITCIsIjIwMjYtMDMtMDMiLCJBVVMiLG51bGwsIkFBIiwiMTM5NCJdXV0="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 20:35"
+                    },
+                    "arrival_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2026-03-03 20:50"
+                    },
+                    "duration": 75,
+                    "airplane": "Airbus A319",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 319",
+                    "legroom": "29 in",
+                    "extensions": [
+                        "Below average legroom (29 in)",
+                        "In-seat USB outlet",
+                        "Carbon emissions estimate: 64 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Heathrow Airport",
+                        "id": "LHR",
+                        "time": "2026-03-04 12:10"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-04 16:50"
+                    },
+                    "duration": 640,
+                    "airplane": "Airbus A350",
+                    "airline": "British Airways",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+                    "travel_class": "Economy",
+                    "flight_number": "BA 191",
+                    "ticket_also_sold_by": [
+                        "American",
+                        "Finnair",
+                        "Iberia"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 461 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 920,
+                    "name": "Heathrow Airport",
+                    "id": "LHR",
+                    "overnight": true
+                }
+            ],
+            "total_duration": 1635,
+            "carbon_emissions": {
+                "this_flight": 526000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 1
+            },
+            "price": 887,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/BA.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3RDUVRNeE9YeENRVEU1TVJvTENMYTBCUkFDR2dOVlUwUTRISEMydEFVPSIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIkxIUiIsbnVsbCwiQkEiLCIzMTkiXSxbIkxIUiIsIjIwMjYtMDMtMDQiLCJBVVMiLG51bGwsIkJBIiwiMTkxIl1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 08:55"
+                    },
+                    "arrival_airport": {
+                        "name": "Hartsfield-Jackson Atlanta International Airport",
+                        "id": "ATL",
+                        "time": "2026-03-03 12:50"
+                    },
+                    "duration": 595,
+                    "airplane": "Airbus A330-900neo",
+                    "airline": "Delta",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "DL 83",
+                    "ticket_also_sold_by": [
+                        "Virgin Atlantic"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 435 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                },
+                {
+                    "departure_airport": {
+                        "name": "Hartsfield-Jackson Atlanta International Airport",
+                        "id": "ATL",
+                        "time": "2026-03-03 15:50"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 17:37"
+                    },
+                    "duration": 167,
+                    "airplane": "Airbus A320",
+                    "airline": "Delta",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "DL 1491",
+                    "ticket_also_sold_by": [
+                        "Virgin Atlantic"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "Live TV",
+                        "Carbon emissions estimate: 132 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 180,
+                    "name": "Hartsfield-Jackson Atlanta International Airport",
+                    "id": "ATL"
+                }
+            ],
+            "total_duration": 942,
+            "carbon_emissions": {
+                "this_flight": 568000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 9
+            },
+            "price": 1572,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3RFVERnemZFUk1NVFE1TVJvTENQWExDUkFDR2dOVlUwUTRISEQxeXdrPSIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIkFUTCIsbnVsbCwiREwiLCI4MyJdLFsiQVRMIiwiMjAyNi0wMy0wMyIsIkFVUyIsbnVsbCwiREwiLCIxNDkxIl1dXQ=="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 10:30"
+                    },
+                    "arrival_airport": {
+                        "name": "Minneapolis–Saint Paul International Airport",
+                        "id": "MSP",
+                        "time": "2026-03-03 13:00"
+                    },
+                    "duration": 570,
+                    "airplane": "Airbus A330",
+                    "airline": "Delta",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "DL 153",
+                    "ticket_also_sold_by": [
+                        "KLM"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "On-demand video",
+                        "Carbon emissions estimate: 427 kg"
+                    ],
+                    "often_delayed_by_over_30_min": true
+                },
+                {
+                    "departure_airport": {
+                        "name": "Minneapolis–Saint Paul International Airport",
+                        "id": "MSP",
+                        "time": "2026-03-03 14:35"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 17:49"
+                    },
+                    "duration": 194,
+                    "airplane": "Airbus A220-100 Passenger",
+                    "airline": "Delta",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "DL 2687",
+                    "ticket_also_sold_by": [
+                        "KLM"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "Live TV",
+                        "Carbon emissions estimate: 203 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 95,
+                    "name": "Minneapolis–Saint Paul International Airport",
+                    "id": "MSP"
+                }
+            ],
+            "total_duration": 859,
+            "carbon_emissions": {
+                "this_flight": 631000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 21
+            },
+            "price": 1572,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3hFVERFMU0zeEVUREkyT0RjYUN3ajF5d2tRQWhvRFZWTkVPQnh3OWNzSiIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIk1TUCIsbnVsbCwiREwiLCIxNTMiXSxbIk1TUCIsIjIwMjYtMDMtMDMiLCJBVVMiLG51bGwsIkRMIiwiMjY4NyJdXV0="
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "Paris Charles de Gaulle Airport",
+                        "id": "CDG",
+                        "time": "2026-03-03 16:05"
+                    },
+                    "arrival_airport": {
+                        "name": "Detroit Metropolitan Wayne County Airport",
+                        "id": "DTW",
+                        "time": "2026-03-03 18:55"
+                    },
+                    "duration": 530,
+                    "airplane": "Airbus A350",
+                    "airline": "Air France",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/AF.png",
+                    "travel_class": "Economy",
+                    "flight_number": "AF 378",
+                    "ticket_also_sold_by": [
+                        "Delta",
+                        "KLM"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Wi-Fi for a fee",
+                        "In-seat USB outlet",
+                        "On-demand video",
+                        "Carbon emissions estimate: 385 kg"
+                    ]
+                },
+                {
+                    "departure_airport": {
+                        "name": "Detroit Metropolitan Wayne County Airport",
+                        "id": "DTW",
+                        "time": "2026-03-03 20:25"
+                    },
+                    "arrival_airport": {
+                        "name": "Austin-Bergstrom International Airport",
+                        "id": "AUS",
+                        "time": "2026-03-03 22:58"
+                    },
+                    "duration": 213,
+                    "airplane": "Airbus A319",
+                    "airline": "Delta",
+                    "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/DL.png",
+                    "travel_class": "Economy",
+                    "flight_number": "DL 1448",
+                    "ticket_also_sold_by": [
+                        "KLM"
+                    ],
+                    "legroom": "31 in",
+                    "extensions": [
+                        "Average legroom (31 in)",
+                        "Free Wi-Fi",
+                        "In-seat power & USB outlets",
+                        "Live TV",
+                        "Carbon emissions estimate: 193 kg"
+                    ]
+                }
+            ],
+            "layovers": [
+                {
+                    "duration": 90,
+                    "name": "Detroit Metropolitan Wayne County Airport",
+                    "id": "DTW"
+                }
+            ],
+            "total_duration": 833,
+            "carbon_emissions": {
+                "this_flight": 578000,
+                "typical_for_this_route": 523000,
+                "difference_percent": 11
+            },
+            "price": 1573,
+            "type": "One way",
+            "airline_logo": "https://www.gstatic.com/flights/airline_logos/70px/multi.png",
+            "extensions": [
+                "Checked baggage for a fee",
+                "Full refund for cancellations",
+                "Free change, possible fare difference"
+            ],
+            "booking_token": "WyJDalJJYVRkMFJtSnNhR1ZMU1RSQlFrdFhRM2RDUnkwdExTMHRMUzB0TFhaM2VXMDBNa0ZCUVVGQlIyeHdjREpOUW5obVpsTkJFZ3hCUmpNM09IeEVUREUwTkRnYUN3aWF6QWtRQWhvRFZWTkVPQnh3bXN3SiIsW1siQ0RHIiwiMjAyNi0wMy0wMyIsIkRUVyIsbnVsbCwiQUYiLCIzNzgiXSxbIkRUVyIsIjIwMjYtMDMtMDMiLCJBVVMiLG51bGwsIkRMIiwiMTQ0OCJdXV0="
+        }
+    ],
+    "price_insights": {
+        "lowest_price": 810,
+        "price_level": "typical",
+        "typical_price_range": [
+            680,
+            1350
+        ],
+        "price_history": [
+            [
+                1763334000,
+                503
+            ],
+            [
+                1763420400,
+                502
+            ],
+            [
+                1763506800,
+                501
+            ],
+            [
+                1763593200,
+                501
+            ],
+            [
+                1763679600,
+                499
+            ],
+            [
+                1763766000,
+                499
+            ],
+            [
+                1763852400,
+                499
+            ],
+            [
+                1763938800,
+                499
+            ],
+            [
+                1764025200,
+                498
+            ],
+            [
+                1764111600,
+                499
+            ],
+            [
+                1764198000,
+                501
+            ],
+            [
+                1764284400,
+                502
+            ],
+            [
+                1764370800,
+                502
+            ],
+            [
+                1764457200,
+                502
+            ],
+            [
+                1764543600,
+                502
+            ],
+            [
+                1764630000,
+                502
+            ],
+            [
+                1764716400,
+                502
+            ],
+            [
+                1764802800,
+                503
+            ],
+            [
+                1764889200,
+                505
+            ],
+            [
+                1764975600,
+                515
+            ],
+            [
+                1765062000,
+                515
+            ],
+            [
+                1765148400,
+                515
+            ],
+            [
+                1765234800,
+                515
+            ],
+            [
+                1765321200,
+                515
+            ],
+            [
+                1765407600,
+                515
+            ],
+            [
+                1765494000,
+                518
+            ],
+            [
+                1765580400,
+                519
+            ],
+            [
+                1765666800,
+                520
+            ],
+            [
+                1765753200,
+                519
+            ],
+            [
+                1765839600,
+                519
+            ],
+            [
+                1765926000,
+                520
+            ],
+            [
+                1766012400,
+                520
+            ],
+            [
+                1766098800,
+                519
+            ],
+            [
+                1766185200,
+                519
+            ],
+            [
+                1766271600,
+                518
+            ],
+            [
+                1766358000,
+                518
+            ],
+            [
+                1766444400,
+                518
+            ],
+            [
+                1766530800,
+                521
+            ],
+            [
+                1766617200,
+                522
+            ],
+            [
+                1766703600,
+                521
+            ],
+            [
+                1766790000,
+                521
+            ],
+            [
+                1766876400,
+                521
+            ],
+            [
+                1766962800,
+                521
+            ],
+            [
+                1767049200,
+                521
+            ],
+            [
+                1767135600,
+                520
+            ],
+            [
+                1767222000,
+                520
+            ],
+            [
+                1767308400,
+                520
+            ],
+            [
+                1767394800,
+                520
+            ],
+            [
+                1767481200,
+                520
+            ],
+            [
+                1767567600,
+                519
+            ],
+            [
+                1767654000,
+                519
+            ],
+            [
+                1767740400,
+                518
+            ],
+            [
+                1767826800,
+                518
+            ],
+            [
+                1767913200,
+                517
+            ],
+            [
+                1767999600,
+                516
+            ],
+            [
+                1768086000,
+                516
+            ],
+            [
+                1768172400,
+                516
+            ],
+            [
+                1768258800,
+                520
+            ],
+            [
+                1768345200,
+                813
+            ],
+            [
+                1768431600,
+                813
+            ],
+            [
+                1768518000,
+                810
+            ]
+        ]
+    },
+    "airports": [
+        {
+            "departure": [
+                {
+                    "airport": {
+                        "id": "CDG",
+                        "name": "Paris Charles de Gaulle Airport"
+                    },
+                    "city": "Paris",
+                    "country": "France",
+                    "country_code": "FR",
+                    "image": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQGx8ii2KbSDdbdzfKye5oDN2bwBA6audqI7XUEf2iMRZezpn_ZbQe1ZIuvUSH-8XOMe958umDwSsAF1w",
+                    "thumbnail": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSyQJ-woNs0iO22mPSkmRUM5gcsTbbYeypQ6BBTeFxXr90mqTxZl57Fdq2CDuLn4w7cKZ8TT9_zZhOpF57rIpA7yWKQnqKvkKIf9Y-qJDo"
+                }
+            ],
+            "arrival": [
+                {
+                    "airport": {
+                        "id": "AUS",
+                        "name": "Austin-Bergstrom International Airport"
+                    },
+                    "city": "Austin",
+                    "country": "United States",
+                    "country_code": "US",
+                    "image": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRKdjkMcBZuGRD1MjnuLQvdGtpTk0RyjdYs0Z8JsPtfIjer-6VvmfmMLxzvBkeyUrhf_focikfda4rVHg",
+                    "thumbnail": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSQ73FSj9E8pKaNvjWKyEDQGfLV-pky_onARvOY-zHWvQ-hOuPJSqyyXzvyg4-kGGAcZxdO6T5SYGWBzrX8x6MSPq7gBHsSLzX9MYjFJWA"
+                }
+            ]
+        }
+    ]
+}

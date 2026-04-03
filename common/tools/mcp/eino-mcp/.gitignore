@@ -1,0 +1,6 @@
+vendor
+env.sh
+tools/mcp-chatbox/mcp-chatbox
+tools/mcp-flight/mcp-time
+tools/mcp-photo/mcp-photo
+tools/mcp-time/mcp-time

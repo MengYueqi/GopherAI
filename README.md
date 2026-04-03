@@ -159,6 +159,15 @@ go build -o mcp-flight main.go
 ./mcp-flight -transport=sse -server_listen=localhost:8082
 ```
 
+Unsplash 图片搜索 MCP 工具服务：
+
+```bash
+export UNSPLASH_ACCESS_KEY=your_access_key
+cd common/tools/mcp/eino-mcp/tools/mcp-photo
+go build -o mcp-photo main.go
+./mcp-photo -transport=sse -server_listen=localhost:8084
+```
+
 Chatbox MCP 工具服务：
 
 ```bash
@@ -172,6 +181,7 @@ MCP 工具服务相关环境变量：
 - `GOOGLE_API_KEY`：Google Search 工具（`mcp-time` 内的 `google_search`）所需 API Key
 - `GOOGLE_SEARCH_ENGINE_ID`：Google Search 工具（`mcp-time` 内的 `google_search`）所需自定义搜索引擎 ID
 - `SERPAPI_API_KEY`：Google Flights 工具（`mcp-flight`）所需的 SerpAPI Key
+- `UNSPLASH_ACCESS_KEY`：Unsplash 图片搜索工具（`mcp-photo`）所需 Access Key
 
 前端：
 
