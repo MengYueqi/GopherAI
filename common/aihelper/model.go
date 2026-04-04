@@ -18,6 +18,15 @@ import (
 )
 
 type StreamCallback func(msg string)
+type TravelPlanningProgressCallback func(progress TravelPlanningProgress)
+
+type TravelPlanningProgress struct {
+	Stage   string
+	Label   string
+	Status  string
+	Detail  string
+	Percent int
+}
 
 const myChatBoxMcpURL = "http://localhost:8083/sse"
 
@@ -26,6 +35,7 @@ type AIModel interface {
 	GenerateResponse(ctx context.Context, messages []*schema.Message, opts ...ToolOption) (*schema.Message, error)
 	StreamResponse(ctx context.Context, messages []*schema.Message, cb StreamCallback) (string, error)
 	GenerateMedicalAdviceResponse(ctx context.Context, messages string) (*schema.Message, error)
+	GenerateMedicalAdviceResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error)
 	GetModelType() string
 }
 
@@ -301,7 +311,11 @@ func (o *OpenAIModel) GenerateResponse(ctx context.Context, messages []*schema.M
 // }
 
 func (o *OpenAIModel) GenerateMedicalAdviceResponse(ctx context.Context, messages string) (*schema.Message, error) {
-	return o.MedicalAgentResp(ctx, messages)
+	return o.GenerateMedicalAdviceResponseWithProgress(ctx, messages, nil)
+}
+
+func (o *OpenAIModel) GenerateMedicalAdviceResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error) {
+	return o.MedicalAgentResp(ctx, messages, cb)
 }
 
 func (o *OpenAIModel) StreamResponse(ctx context.Context, messages []*schema.Message, cb StreamCallback) (string, error) {
@@ -386,6 +400,19 @@ func (o *OllamaModel) StreamResponse(ctx context.Context, messages []*schema.Mes
 func (o *OllamaModel) GetModelType() string { return "ollama" }
 
 func (o *OllamaModel) GenerateMedicalAdviceResponse(ctx context.Context, messages string) (*schema.Message, error) {
+	return o.GenerateMedicalAdviceResponseWithProgress(ctx, messages, nil)
+}
+
+func (o *OllamaModel) GenerateMedicalAdviceResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error) {
+	if cb != nil {
+		cb(TravelPlanningProgress{
+			Stage:   "json_structuring",
+			Label:   "结构化整理",
+			Status:  "completed",
+			Detail:  "当前模型返回的是演示内容，未执行真实旅行规划流程。",
+			Percent: 100,
+		})
+	}
 	return &schema.Message{
 		Role:    schema.Assistant,
 		Content: "这是一个医疗建议的回复示例。",

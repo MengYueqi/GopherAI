@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudwego/eino-ext/components/tool/mcp"
 	"github.com/cloudwego/eino/adk"
+	"github.com/cloudwego/eino/callbacks"
 	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
@@ -40,44 +41,41 @@ func loadPromptFile(path string) (string, error) {
 	return content, nil
 }
 
-func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) (*schema.Message, error) {
-	// 构建旅游路径规划的响应逻辑
+func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string, progressCb TravelPlanningProgressCallback) (*schema.Message, error) {
 	g := compose.NewGraph[map[string]any, *schema.Message]()
 	systemPrompt, err := loadPromptFile(medicalRedFlagPromptPath)
 	if err != nil {
 		log.Printf("ERROR: %v\n", err)
 		return nil, err
 	}
-	red_flag_pt := prompt.FromMessages(
-		schema.FString,
-		schema.SystemMessage(systemPrompt),
-		schema.UserMessage("旅行需求描述：{description}"),
-	)
 	summaryPrompt, err := loadPromptFile(medicalSummaryPromptPath)
 	if err != nil {
 		log.Printf("ERROR: %v\n", err)
 		return nil, err
 	}
-	summary_pt := prompt.FromMessages(
+	redFlagPrompt := prompt.FromMessages(
+		schema.FString,
+		schema.SystemMessage(systemPrompt),
+		schema.UserMessage("旅行需求描述：{description}"),
+	)
+	summaryPromptTemplate := prompt.FromMessages(
 		schema.FString,
 		schema.SystemMessage(summaryPrompt),
 		schema.UserMessage("规划内容：{content}"),
 	)
 
-	_ = g.AddChatTemplateNode("nodeOfPlanFeasibilityPrompt", red_flag_pt)
-	_ = g.AddChatModelNode("distinctPlanFeasibility", o.llm, compose.WithNodeName("ChatModel"))
+	_ = g.AddChatTemplateNode("nodeOfPlanFeasibilityPrompt", redFlagPrompt, compose.WithNodeName("plan_feasibility_prompt"))
+	_ = g.AddChatModelNode("distinctPlanFeasibility", o.llm, compose.WithNodeName("feasibility_check"))
 	_ = g.AddLambdaNode("parsePlanDecisionJSON", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (ModelJudgment, error) {
-		// 解析模型输出，提取可行性判断
 		outputContent := input.Content
 		log.Printf("Model output for plan feasibility classification: %s\n", outputContent)
-		// 根据输入的 JSON 字符串，提取 red_flag 字段
 		var mj ModelJudgment
 		err = json.Unmarshal([]byte(outputContent), &mj)
 		log.Printf("Parsed ModelJudgment: %+v\n", mj)
 		return mj, nil
-	}))
+	}), compose.WithNodeName("parse_plan_decision"))
 
-	divide_plan_feasibility_condition := compose.NewGraphBranch(
+	dividePlanFeasibilityCondition := compose.NewGraphBranch(
 		isRedFlag,
 		map[string]bool{
 			"plan_blocked_condition": true,
@@ -85,7 +83,6 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		},
 	)
 
-	// 占位 plan_blocked_condition 和 plan_allowed_condition 节点
 	_ = g.AddLambdaNode("plan_blocked_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res []*schema.Message, err error) {
 		log.Printf("Final plan feasibility result (blocked): %+v\n", input)
 		noticeTemplate, err := loadPromptFile(medicalRedFlagNoticePath)
@@ -94,13 +91,11 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		}
 		content := strings.ReplaceAll(noticeTemplate, "{description}", input.Description)
 		content = strings.ReplaceAll(content, "{address}", input.Address)
-		return []*schema.Message{
-			{
-				Role:    schema.Assistant,
-				Content: content,
-			},
-		}, nil
-	}))
+		return []*schema.Message{{
+			Role:    schema.Assistant,
+			Content: content,
+		}}, nil
+	}), compose.WithNodeName("prepare_blocked_notice"))
 
 	// // 构建旅游路径规划的 agent
 	cli, err := initMCPClient(ctx, myBaseURL)
@@ -222,34 +217,10 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		log.Printf("ERROR creating travel json formatter: %v\n", err)
 		return nil, err
 	}
-
 	_ = g.AddLambdaNode("plan_blocked_deal", compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (res *schema.Message, err error) {
 		log.Printf("Handling plan blocked case with request: %+v\n", input)
-		// 使用 agent 处理不可规划情况
-		runner := adk.NewRunner(ctx, adk.RunnerConfig{
-			Agent: red_flag_agent,
-		})
-		iter := runner.Query(ctx, input[0].Content)
-		var allmsg string
-		for {
-			event, ok := iter.Next()
-			if !ok {
-				break
-			}
-			if event.Err != nil {
-				log.Fatal(event.Err)
-			}
-			msg, err := event.Output.MessageOutput.GetMessage()
-			if err != nil {
-				log.Fatal(err)
-			}
-			allmsg = msg.Content
-			log.Printf("\nmessage:\n%+v\n======", msg)
-		}
-		return &schema.Message{Content: allmsg}, nil
-	}))
-
-	// _ = g.AddChatModelNode("red_flag_deal", o.llm, compose.WithNodeName("RedFlagChatModel"))
+		return runAgentQuery(ctx, red_flag_agent, input[0].Content)
+	}), compose.WithNodeName("requirements_feedback"))
 
 	_ = g.AddLambdaNode("plan_allowed_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res []*schema.Message, err error) {
 		log.Printf("Final plan feasibility result (allowed): %+v\n", input)
@@ -259,134 +230,58 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		}
 		content := strings.ReplaceAll(noticeTemplate, "{description}", input.Description)
 		content = strings.ReplaceAll(content, "{address}", input.Address)
-		return []*schema.Message{
-			{
-				Role:    schema.Assistant,
-				Content: content,
-			},
-		}, nil
-	}))
+		return []*schema.Message{{
+			Role:    schema.Assistant,
+			Content: content,
+		}}, nil
+	}), compose.WithNodeName("prepare_allowed_notice"))
 
-	// 绑定 overallRoutePlanner agent 节点
 	_ = g.AddLambdaNode("overall_route_planner", compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (res *schema.Message, err error) {
 		log.Printf("Handling overall route planning with request: %+v\n", input)
-		runner := adk.NewRunner(ctx, adk.RunnerConfig{
-			Agent: overallRoutePlanner,
-		})
-		iter := runner.Query(ctx, input[0].Content)
-		var allmsg string
-		for {
-			event, ok := iter.Next()
-			if !ok {
-				break
-			}
-			if event.Err != nil {
-				return nil, event.Err
-			}
-			msg, err := event.Output.MessageOutput.GetMessage()
-			if err != nil {
-				return nil, err
-			}
-			allmsg = msg.Content
-		}
-		return &schema.Message{Content: allmsg}, nil
-	}))
+		return runAgentQuery(ctx, overallRoutePlanner, input[0].Content)
+	}), compose.WithNodeName("overall_route"))
 
-	// 绑定 flightPlanner agent 节点
 	_ = g.AddLambdaNode("flight_planner", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (res map[string]any, err error) {
 		log.Printf("Handling flight planning with request: %+v\n", input)
-		runner := adk.NewRunner(ctx, adk.RunnerConfig{
-			Agent: flightPlanner,
-		})
-		iter := runner.Query(ctx, input.Content)
-		var allmsg string
-		for {
-			event, ok := iter.Next()
-			if !ok {
-				break
-			}
-			if event.Err != nil {
-				return nil, event.Err
-			}
-			msg, err := event.Output.MessageOutput.GetMessage()
-			if err != nil {
-				return nil, err
-			}
-			allmsg = msg.Content
+		msg, err := runAgentQuery(ctx, flightPlanner, input.Content)
+		if err != nil {
+			return nil, err
 		}
-		return map[string]any{"航班规划": allmsg}, nil
-	}))
+		return map[string]any{"航班规划": msg.Content}, nil
+	}), compose.WithNodeName("flight_planning"))
 
-	// 绑定 attractionPlanner agent 节点
 	_ = g.AddLambdaNode("attraction_planner", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (res map[string]any, err error) {
 		log.Printf("Handling attraction highlights with request: %+v\n", input)
-		runner := adk.NewRunner(ctx, adk.RunnerConfig{
-			Agent: attractionPlanner,
-		})
-		iter := runner.Query(ctx, input.Content)
-		var allmsg string
-		for {
-			event, ok := iter.Next()
-			if !ok {
-				break
-			}
-			if event.Err != nil {
-				return nil, event.Err
-			}
-			msg, err := event.Output.MessageOutput.GetMessage()
-			if err != nil {
-				return nil, err
-			}
-			allmsg = msg.Content
+		msg, err := runAgentQuery(ctx, attractionPlanner, input.Content)
+		if err != nil {
+			return nil, err
 		}
-		return map[string]any{"重点景点规划": allmsg}, nil
-	}))
+		return map[string]any{"重点景点规划": msg.Content}, nil
+	}), compose.WithNodeName("attraction_planning"))
+
 	_ = g.AddLambdaNode("summary_prompt_input", compose.InvokableLambda(func(ctx context.Context, input map[string]any) (map[string]any, error) {
-		// 整合各部分内容到一个字符串
 		content := ""
 		for k, v := range input {
 			content += fmt.Sprintf("%s：%s\n", k, v)
 		}
 		log.Printf("Summary prompt input content: %s\n", content)
 		return map[string]any{"content": content}, nil
-	}))
+	}), compose.WithNodeName("prepare_summary_prompt"))
 	_ = g.AddLambdaNode("change_overall_output", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (map[string]any, error) {
 		return map[string]any{"overall": input.Content}, nil
-	}))
-	_ = g.AddChatTemplateNode("summary_prompt", summary_pt)
-	_ = g.AddChatModelNode("summary_model", o.llm, compose.WithNodeName("ChatModel"))
+	}), compose.WithNodeName("capture_overall_output"))
+	_ = g.AddChatTemplateNode("summary_prompt", summaryPromptTemplate, compose.WithNodeName("summary_prompt"))
+	_ = g.AddChatModelNode("summary_model", o.llm, compose.WithNodeName("plan_summary"))
 	_ = g.AddLambdaNode("travel_json_formatter", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (*schema.Message, error) {
-		runner := adk.NewRunner(ctx, adk.RunnerConfig{
-			Agent: travelJSONFormatter,
-		})
-		iter := runner.Query(ctx, input.Content)
-		var allmsg string
-		for {
-			event, ok := iter.Next()
-			if !ok {
-				break
-			}
-			if event.Err != nil {
-				return nil, event.Err
-			}
-			msg, err := event.Output.MessageOutput.GetMessage()
-			if err != nil {
-				return nil, err
-			}
-			allmsg = msg.Content
-		}
-		return &schema.Message{Content: allmsg}, nil
-	}))
+		return runAgentQuery(ctx, travelJSONFormatter, input.Content)
+	}), compose.WithNodeName("json_structuring"))
 
-	// 对旅行需求进行可行性分类
 	_ = g.AddEdge(compose.START, "nodeOfPlanFeasibilityPrompt")
 	_ = g.AddEdge("nodeOfPlanFeasibilityPrompt", "distinctPlanFeasibility")
 	_ = g.AddEdge("distinctPlanFeasibility", "parsePlanDecisionJSON")
-	_ = g.AddBranch("parsePlanDecisionJSON", divide_plan_feasibility_condition)
-	// 不可规划情况处理
+	_ = g.AddBranch("parsePlanDecisionJSON", dividePlanFeasibilityCondition)
 	_ = g.AddEdge("plan_blocked_condition", "plan_blocked_deal")
 	_ = g.AddEdge("plan_blocked_deal", compose.END)
-	// 可规划情况处理
 	_ = g.AddEdge("plan_allowed_condition", "overall_route_planner")
 	_ = g.AddEdge("overall_route_planner", "flight_planner")
 	_ = g.AddEdge("overall_route_planner", "attraction_planner")
@@ -402,19 +297,87 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	r, err := g.Compile(ctx)
 	if err != nil {
 		log.Printf("ERROR in compile the graph: %v \n", err)
-		// panic(err)
+		return nil, err
 	}
 
 	in := map[string]any{
 		"description": description,
 	}
-	ret, err := r.Invoke(ctx, in)
+	ret, err := r.Invoke(ctx, in, compose.WithCallbacks(buildTravelPlanningCallback(progressCb)))
 	if err != nil {
 		log.Printf("ERROR in invoke the graph: %v \n", err)
 		return nil, err
 	}
-	fmt.Println("invoke result: ", ret)
 	return ret, nil
+}
+
+func buildTravelPlanningCallback(progressCb TravelPlanningProgressCallback) callbacks.Handler {
+	stageMeta := map[string]TravelPlanningProgress{
+		"feasibility_check":     {Stage: "feasibility_check", Label: "可行性评估", Detail: "正在判断需求是否足以开始规划。", Percent: 20},
+		"requirements_feedback": {Stage: "requirements_feedback", Label: "需求补充建议", Detail: "正在生成补充信息与修改建议。", Percent: 100},
+		"overall_route":         {Stage: "overall_route", Label: "总体路线设计", Detail: "正在规划整体路线与行程节奏。", Percent: 45},
+		"flight_planning":       {Stage: "flight_planning", Label: "机票信息分析", Detail: "正在评估航班价格与购票建议。", Percent: 68},
+		"attraction_planning":   {Stage: "attraction_planning", Label: "景点亮点规划", Detail: "正在补充每日景点和亮点内容。", Percent: 82},
+		"plan_summary":          {Stage: "plan_summary", Label: "行程汇总成文", Detail: "正在汇总多阶段结果。", Percent: 94},
+		"json_structuring":      {Stage: "json_structuring", Label: "结构化整理", Detail: "正在整理为前端可直接渲染的结构化结果。", Percent: 100},
+	}
+
+	send := func(status string, info *callbacks.RunInfo, detail string) context.Context {
+		if progressCb == nil || info == nil {
+			return context.Background()
+		}
+		meta, ok := stageMeta[info.Name]
+		if !ok {
+			return context.Background()
+		}
+		progressCb(TravelPlanningProgress{
+			Stage:   meta.Stage,
+			Label:   meta.Label,
+			Status:  status,
+			Detail:  detail,
+			Percent: meta.Percent,
+		})
+		return context.Background()
+	}
+
+	return callbacks.NewHandlerBuilder().
+		OnStartFn(func(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) context.Context {
+			meta, ok := stageMeta[info.Name]
+			if !ok {
+				return ctx
+			}
+			progressCb(TravelPlanningProgress{
+				Stage:   meta.Stage,
+				Label:   meta.Label,
+				Status:  "running",
+				Detail:  meta.Detail,
+				Percent: max(1, meta.Percent-10),
+			})
+			return ctx
+		}).
+		OnEndFn(func(ctx context.Context, info *callbacks.RunInfo, output callbacks.CallbackOutput) context.Context {
+			if _, ok := stageMeta[info.Name]; !ok {
+				return ctx
+			}
+			return send("completed", info, stageMeta[info.Name].Detail)
+		}).
+		OnErrorFn(func(ctx context.Context, info *callbacks.RunInfo, err error) context.Context {
+			if _, ok := stageMeta[info.Name]; !ok {
+				return ctx
+			}
+			if progressCb != nil {
+				meta := stageMeta[info.Name]
+				progressCb(TravelPlanningProgress{
+					Stage:   meta.Stage,
+					Label:   meta.Label,
+					Status:  "failed",
+					Detail:  err.Error(),
+					Percent: meta.Percent,
+				})
+			}
+			return ctx
+		}).
+		Build()
 }
 
 func isRedFlag(ctx context.Context, prevJ ModelJudgment) (string, error) {
@@ -422,7 +385,29 @@ func isRedFlag(ctx context.Context, prevJ ModelJudgment) (string, error) {
 	log.Printf("plan feasibility (blocked) result: %v", result)
 	if result {
 		return "plan_blocked_condition", nil
-	} else {
-		return "plan_allowed_condition", nil
 	}
+	return "plan_allowed_condition", nil
+}
+
+func runAgentQuery(ctx context.Context, agent adk.Agent, query string) (*schema.Message, error) {
+	runner := adk.NewRunner(ctx, adk.RunnerConfig{
+		Agent: agent,
+	})
+	iter := runner.Query(ctx, query)
+	var allmsg string
+	for {
+		event, ok := iter.Next()
+		if !ok {
+			break
+		}
+		if event.Err != nil {
+			return nil, event.Err
+		}
+		msg, err := event.Output.MessageOutput.GetMessage()
+		if err != nil {
+			return nil, err
+		}
+		allmsg = msg.Content
+	}
+	return &schema.Message{Content: allmsg}, nil
 }

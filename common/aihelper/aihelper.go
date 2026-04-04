@@ -127,6 +127,16 @@ func (a *AIHelper) GenerateMedicalAdviceResponse(ctx context.Context, descriptio
 	return modelMsg, nil
 }
 
+func (a *AIHelper) GenerateMedicalAdviceResponseWithProgress(ctx context.Context, description string, cb TravelPlanningProgressCallback) (*model.Message, error) {
+	schemaMsg, err := a.model.GenerateMedicalAdviceResponseWithProgress(ctx, description, cb)
+	if err != nil {
+		return nil, err
+	}
+
+	modelMsg := utils.ConvertToModelMessage(a.SessionID, "", schemaMsg)
+	return modelMsg, nil
+}
+
 // 流式生成
 // FIXME: 目前流式回调函数存在问题，还是都生成了再统一回复，同时到前端渲染也有问题
 func (a *AIHelper) StreamResponse(userName string, ctx context.Context, cb StreamCallback, userQuestion string) (*model.Message, error) {

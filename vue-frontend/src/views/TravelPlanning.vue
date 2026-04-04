@@ -39,10 +39,25 @@
       </template>
 
       <template v-else>
-        <div class="loading-state" v-if="loading">
-          <div class="loading-spinner"></div>
-          <h3>正在为您运筹行程方案...</h3>
-          <p>已用时 {{ elapsedSeconds }}秒，请稍候</p>
+        <TravelPlanningProgress
+          v-if="hasTask"
+          class="progress-panel"
+          :task="travelTask"
+          :elapsed-seconds="elapsedSeconds"
+        />
+
+        <div v-if="loading" class="loading-hint">
+          <p>系统正在分阶段推演行程，请稍候。</p>
+        </div>
+
+        <div class="result-card" v-else-if="travelTask.state === 'failed'">
+          <div class="result-header">
+            <h3>规划失败</h3>
+            <button type="button" class="secondary-btn" @click="resetToInput">
+              重新发起
+            </button>
+          </div>
+          <p class="error-text">{{ travelTask.error_message || '生成失败，请稍后再试。' }}</p>
         </div>
 
         <div class="result-card" v-else>
@@ -166,6 +181,7 @@ import { computed, onUnmounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { MdPreview } from 'md-editor-v3'
 import api from '../utils/api'
+import TravelPlanningProgress from '../components/travel/TravelPlanningProgress.vue'
 
 const createEmptyPlan = () => ({
   mode: '',
@@ -181,6 +197,19 @@ const createEmptyPlan = () => ({
   sources: [],
   notice: '',
   raw_text: ''
+})
+
+const createEmptyTask = () => ({
+  task_id: '',
+  state: '',
+  description: '',
+  current_stage: '',
+  current_stage_label: '',
+  current_detail: '',
+  progress_percent: 0,
+  error_message: '',
+  stages: [],
+  advice: createEmptyPlan()
 })
 
 const normalizePlan = (payload) => {
@@ -227,20 +256,25 @@ const normalizePlan = (payload) => {
 export default {
   name: 'TravelPlanning',
   components: {
-    MdPreview
+    MdPreview,
+    TravelPlanningProgress
   },
   setup() {
     const description = ref('')
     const loading = ref(false)
     const planData = ref(createEmptyPlan())
     const rawAdvice = ref('')
+    const travelTask = ref(createEmptyTask())
     const elapsedSeconds = ref(0)
     const showInput = ref(true)
     let timerId = null
+    let pollTimerId = null
 
     const hasStructuredPlan = computed(() => {
       return planData.value.mode === 'plan' && Array.isArray(planData.value.daily_plans) && planData.value.daily_plans.length > 0
     })
+
+    const hasTask = computed(() => Boolean(travelTask.value?.task_id))
 
     const startTimer = () => {
       elapsedSeconds.value = 0
@@ -257,46 +291,103 @@ export default {
       }
     }
 
-    const submitAdvice = async () => {
-      if (!description.value.trim() || loading.value) return
-      showInput.value = false
-      loading.value = true
-      startTimer()
-      try {
-        const payload = { description: description.value.trim() }
-        const response = await api.post('/AI/agent/medical_advice', payload)
+    const stopPolling = () => {
+      if (pollTimerId) {
+        clearInterval(pollTimerId)
+        pollTimerId = null
+      }
+    }
 
-        if (response.data && response.data.status_code === 1000) {
-          const advice = response.data.advice
-          if (advice && typeof advice === 'object') {
-            planData.value = normalizePlan(advice)
-            rawAdvice.value = advice.raw_text || ''
-          } else {
-            planData.value = createEmptyPlan()
-            rawAdvice.value = typeof advice === 'string' ? advice : '暂无建议'
-          }
-          description.value = ''
-        } else {
-          const message = response.data?.status_msg || '生成失败，请稍后再试'
-          ElMessage.error(message)
-        }
-      } catch (error) {
-        ElMessage.error(error?.response?.data?.status_msg || '无法连接到服务器')
-      } finally {
+    const applyTaskSnapshot = (task) => {
+      travelTask.value = task ? {
+        ...createEmptyTask(),
+        ...task,
+        stages: Array.isArray(task.stages) ? task.stages : []
+      } : createEmptyTask()
+    }
+
+    const fetchTaskStatus = async (taskId) => {
+      const response = await api.get(`/AI/agent/medical_advice/tasks/${taskId}`)
+      if (!response.data || response.data.status_code !== 1000) {
+        throw new Error(response.data?.status_msg || '无法获取规划进度')
+      }
+      const task = response.data.task || createEmptyTask()
+      applyTaskSnapshot(task)
+
+      if (task.state === 'succeeded') {
+        planData.value = normalizePlan(task.advice)
+        rawAdvice.value = task.advice?.raw_text || ''
         loading.value = false
+        stopPolling()
+        stopTimer()
+      } else if (task.state === 'failed') {
+        loading.value = false
+        stopPolling()
         stopTimer()
       }
     }
 
+    const startPollingTask = (taskId) => {
+      stopPolling()
+      pollTimerId = setInterval(() => {
+        fetchTaskStatus(taskId).catch((error) => {
+          stopPolling()
+          stopTimer()
+          loading.value = false
+          ElMessage.error(error?.message || error?.response?.data?.status_msg || '无法获取规划进度')
+        })
+      }, 1000)
+    }
+
+    const submitAdvice = async () => {
+      if (!description.value.trim() || loading.value) return
+      showInput.value = false
+      loading.value = true
+      planData.value = createEmptyPlan()
+      rawAdvice.value = ''
+      travelTask.value = createEmptyTask()
+      startTimer()
+      try {
+        const payload = { description: description.value.trim() }
+        const response = await api.post('/AI/agent/medical_advice/tasks', payload)
+
+        if (!response.data || response.data.status_code !== 1000) {
+          throw new Error(response.data?.status_msg || '生成失败，请稍后再试')
+        }
+
+        const task = response.data.task || createEmptyTask()
+        applyTaskSnapshot(task)
+        description.value = ''
+        await fetchTaskStatus(task.task_id)
+        if (loading.value) {
+          startPollingTask(task.task_id)
+        }
+      } catch (error) {
+        loading.value = false
+        stopTimer()
+        stopPolling()
+        ElMessage.error(error?.message || error?.response?.data?.status_msg || '无法连接到服务器')
+      } finally {
+        if (!loading.value) {
+          stopTimer()
+        }
+      }
+    }
+
     const resetToInput = () => {
+      stopPolling()
+      stopTimer()
       showInput.value = true
       planData.value = createEmptyPlan()
       rawAdvice.value = ''
+      travelTask.value = createEmptyTask()
       description.value = ''
+      loading.value = false
     }
 
     onUnmounted(() => {
       stopTimer()
+      stopPolling()
     })
 
     return {
@@ -304,8 +395,10 @@ export default {
       loading,
       planData,
       rawAdvice,
+      travelTask,
       elapsedSeconds,
       showInput,
+      hasTask,
       hasStructuredPlan,
       submitAdvice,
       resetToInput
@@ -472,6 +565,23 @@ textarea:focus {
   border-radius: var(--radius-lg);
   padding: 28px;
   background: rgba(255, 255, 255, 0.95);
+}
+
+.progress-panel {
+  margin-bottom: 20px;
+}
+
+.loading-hint {
+  border: 1px dashed rgba(157, 41, 51, 0.24);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  background: rgba(255, 248, 240, 0.86);
+}
+
+.loading-hint p,
+.error-text {
+  margin: 0;
+  line-height: 1.8;
 }
 
 .result-header {

@@ -18,5 +18,7 @@ func AIRouter(r *gin.RouterGroup) {
 		r.POST("/chat/send-stream-new-session", session.CreateStreamSessionAndSendMessage)
 		r.POST("/chat/send-stream", session.ChatStreamSend)
 		r.POST("/agent/medical_advice", session.GenerateMedicalAdvice)
+		r.POST("/agent/medical_advice/tasks", session.CreateTravelPlanningTask)
+		r.GET("/agent/medical_advice/tasks/:taskId", session.GetTravelPlanningTask)
 	}
 }

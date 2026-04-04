@@ -56,6 +56,14 @@ type (
 		Advice model.TravelPlanPayload `json:"advice,omitempty"`
 		controller.Response
 	}
+	CreateTravelPlanningTaskResponse struct {
+		Task model.TravelPlanningTaskSnapshot `json:"task,omitempty"`
+		controller.Response
+	}
+	GetTravelPlanningTaskResponse struct {
+		Task model.TravelPlanningTaskSnapshot `json:"task,omitempty"`
+		controller.Response
+	}
 )
 
 func GetUserSessionsByUserName(c *gin.Context) {
@@ -89,6 +97,44 @@ func GenerateMedicalAdvice(c *gin.Context) {
 	}
 	res.Success()
 	res.Advice = advice
+	c.JSON(http.StatusOK, res)
+}
+
+func CreateTravelPlanningTask(c *gin.Context) {
+	req := new(MedicalAdviceRequest)
+	res := new(CreateTravelPlanningTaskResponse)
+	if err := c.ShouldBindJSON(req); err != nil {
+		c.JSON(http.StatusOK, res.CodeOf(code.CodeInvalidParams))
+		return
+	}
+
+	task, code_ := session.StartTravelPlanningTask(req.Description)
+	if code_ != code.CodeSuccess {
+		c.JSON(http.StatusOK, res.CodeOf(code_))
+		return
+	}
+
+	res.Success()
+	res.Task = task
+	c.JSON(http.StatusOK, res)
+}
+
+func GetTravelPlanningTask(c *gin.Context) {
+	res := new(GetTravelPlanningTaskResponse)
+	taskID := c.Param("taskId")
+	if taskID == "" {
+		c.JSON(http.StatusOK, res.CodeOf(code.CodeInvalidParams))
+		return
+	}
+
+	task, code_ := session.GetTravelPlanningTask(taskID)
+	if code_ != code.CodeSuccess {
+		c.JSON(http.StatusOK, res.CodeOf(code_))
+		return
+	}
+
+	res.Success()
+	res.Task = task
 	c.JSON(http.StatusOK, res)
 }
 
