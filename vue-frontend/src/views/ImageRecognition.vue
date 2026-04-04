@@ -1,35 +1,34 @@
 <template>
   <div class="image-recognition-container">
-    <aside class="vision-sidebar glass-panel">
-      <span class="pill">Vision Lab</span>
-      <h1>图像识别助手</h1>
+    <aside class="vision-sidebar chinese-panel">
+      <span class="chinese-tag">知形阁</span>
+      <h1>知形 · 识万物</h1>
       <p>
-        重新绘制的界面为图像识别打造更沉浸的体验。拖拽或点击上传即可完成解析，
-        历史记录与 AI 回复都保留在右侧的实时流中。
+        慧眼识真，万物皆可辨。拖拽或点击上传即可识别，历史记录皆可追溯。
       </p>
       <ul class="vision-highlights">
         <li>
-          <strong>全格式支持</strong>
-          <span>PNG / JPG / WebP / HEIC 等主流格式。</span>
+          <strong>万式兼容</strong>
+          <span>支持PNG、JPG、WebP、HEIC等主流格式。</span>
         </li>
         <li>
-          <strong>安全上传</strong>
-          <span>仅当前会话可访问的临时 URL。</span>
+          <strong>传输无忧</strong>
+          <span>仅当前会话可访问，安全无虞。</span>
         </li>
         <li>
-          <strong>实时结果</strong>
-          <span>识别成功后立即推送到消息流。</span>
+          <strong>立等可得</strong>
+          <span>识别成功即刻返回结果。</span>
         </li>
       </ul>
     </aside>
 
-    <section class="vision-console glass-panel">
+    <section class="vision-console chinese-panel">
       <div class="top-bar">
         <div>
-          <h2>识别时间轴</h2>
-          <p>每次识别都会记录在此，方便快速对比。</p>
+          <h2>识鉴录</h2>
+          <p>历次识别皆记录于此，便于比对查阅。</p>
         </div>
-        <button class="back-btn" @click="$router.push('/menu')">回到菜单</button>
+        <button class="back-btn" @click="$router.push('/menu')">返</button>
       </div>
 
       <div class="chat-messages" ref="chatContainerRef">
@@ -39,7 +38,7 @@
           :class="['message', message.role === 'user' ? 'user-message' : 'ai-message']"
         >
           <div class="message-header">
-            <b>{{ message.role === 'user' ? '你' : 'AI' }}:</b>
+            <b>{{ message.role === 'user' ? '君' : '智' }}:</b>
           </div>
           <div class="message-content">
             <span>{{ message.content }}</span>
@@ -61,14 +60,14 @@
             />
             <div class="drop-icon">＋</div>
             <div>
-              <strong>拖拽或点击上传</strong>
-              <p>最大 10MB，图片仅用于当前识别</p>
+              <strong>拖拽或点击上图</strong>
+              <p>最大10MB，图片仅用于本次识别</p>
             </div>
             <span class="file-name" v-if="selectedFile">{{ selectedFile.name }}</span>
           </label>
           <div class="upload-actions">
-            <span>支持批量识别，请逐张上传以确保准确率。</span>
-            <button type="submit" :disabled="!selectedFile">发送图片</button>
+            <span>支持批量识别，逐张上传以保精准。</span>
+            <button type="submit" :disabled="!selectedFile">鉴图</button>
           </div>
         </form>
       </div>
@@ -178,24 +177,42 @@ export default {
   grid-template-columns: minmax(260px, 360px) 1fr;
   gap: 32px;
   padding: 48px 5vw 64px;
+  background: var(--bg-color);
 }
 
 .vision-sidebar {
   padding: 48px;
   color: #fff;
-  background: linear-gradient(160deg, rgba(14, 23, 63, 0.95), rgba(49, 63, 166, 0.9));
+  background: linear-gradient(160deg, var(--pine), var(--jade));
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vision-sidebar::before {
+  content: '';
+  position: absolute;
+  right: -20%;
+  top: -20%;
+  width: 300px;
+  height: 300px;
+  background: url("data:image/svg+xml,%3Csvg width='300' height='300' viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M150 30C80 30 30 80 30 150s50 120 120 120 120-50 120-120S220 30 150 30zm0 200c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80z' fill='%23fff' fill-opacity='0.05'/%3E%3Cpath d='M150 70c-44.2 0-80 35.8-80 80s35.8 80 80 80 80-35.8 80-80-35.8-80-80-80zm0 140c-33.1 0-60-26.9-60-60s26.9-60 60-60 60 26.9 60 60-26.9 60-60 60z' fill='%23fff' fill-opacity='0.05'/%3E%3C/svg%3E");
+  opacity: 0.3;
 }
 
 .vision-sidebar h1 {
   margin: 0;
   font-size: 36px;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
 .vision-sidebar p {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.8;
 }
 
 .vision-highlights {
@@ -208,19 +225,29 @@ export default {
 
 .vision-highlights li {
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  padding: 18px;
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.vision-highlights li:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
 }
 
 .vision-highlights strong {
   display: block;
   margin-bottom: 6px;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .vision-highlights span {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 14px;
+  line-height: 1.6;
 }
 
 .vision-console {

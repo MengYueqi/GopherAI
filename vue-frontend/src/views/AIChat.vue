@@ -1,13 +1,13 @@
 <template>
   <div class="ai-chat-container">
     <!-- 左侧会话列表 -->
-    <div class="session-list">
+    <div class="session-list chinese-panel">
       <div class="session-list-header">
         <div>
-          <h2>会话总览</h2>
-          <p>所有历史对话集中在此，随时切换与追溯。</p>
+          <h2>会话集</h2>
+          <p>历史对话尽在掌握，往来问答历历可查。</p>
         </div>
-        <button class="new-chat-btn" @click="createNewSession">＋ 新对话</button>
+        <button class="new-chat-btn" @click="createNewSession">＋ 新言</button>
       </div>
       <ul class="session-list-ul">
         <li
@@ -16,7 +16,7 @@
           :class="['session-item', { active: currentSessionId === session.id }]"
           @click="switchSession(session.id)"
         >
-          <div class="session-name">{{ session.name || `会话 ${session.id}` }}</div>
+          <div class="session-name">{{ session.name || `言 ${session.id}` }}</div>
           <div class="session-model" v-if="session.modelType">模型：{{ session.modelType }}</div>
           <div class="session-updated" v-if="session.updateAt">更新：{{ formatUpdateTime(session.updateAt) }}</div>
         </li>
@@ -24,21 +24,21 @@
     </div>
 
     <!-- 右侧聊天区域 -->
-    <div class="chat-section">
+    <div class="chat-section chinese-panel">
       <div class="top-bar">
         <div class="top-left">
           <div class="top-heading">
-            <h2>智能聊天控制台</h2>
-            <p>当前共有 {{ sessions.length }} 个会话可用，开启新对话或同步历史。</p>
+            <h2>知言 · 对话阁</h2>
+            <p>当前共有 {{ sessions.length }} 段对话，可开启新言或同步过往记录。</p>
           </div>
           <div class="top-actions">
-            <button class="back-btn" @click="$router.push('/menu')">← 返回</button>
-            <button class="sync-btn" @click="syncHistory" :disabled="!currentSessionId || tempSession">同步历史数据</button>
+            <button class="back-btn" @click="$router.push('/menu')">← 返</button>
+            <button class="sync-btn" @click="syncHistory" :disabled="!currentSessionId || tempSession">同步过往</button>
           </div>
         </div>
         <div class="top-controls">
           <div class="select-group">
-            <label for="modelType">选择模型</label>
+            <label for="modelType">择模</label>
             <select id="modelType" v-model="selectedModel" class="model-select">
               <option value="1">openai</option>
               <option value="2">ollama</option>
@@ -52,8 +52,8 @@
           >
             <span class="chip-indicator google"></span>
             <span class="chip-text">
-              <strong>流式响应</strong>
-              <small>实时输出</small>
+              <strong>流韵</strong>
+              <small>应答如流</small>
             </span>
           </button>
           <!-- <button
@@ -90,7 +90,7 @@
           :class="['message', message.role === 'user' ? 'user-message' : 'ai-message']"
         >
           <div class="message-header">
-            <b>{{ message.role === 'user' ? '你' : 'AI' }}:</b>
+            <b>{{ message.role === 'user' ? '君' : '智' }}:</b>
             <button v-if="message.role === 'assistant'" class="tts-btn" @click="playTTS(message.content)">🔊</button>
             <span v-if="message.meta && message.meta.status === 'streaming'" class="streaming-indicator"> ··</span>
           </div>
@@ -108,11 +108,11 @@
 
       <div class="chat-input">
         <div class="chat-input-hint" v-if="!canInteract">
-          请点击“新聊天”或选择历史会话后再输入
+          请点击“新言”或选择过往会话后输入
         </div>
         <textarea
           v-model="inputMessage"
-          placeholder="请输入你的问题..."
+          placeholder="请输入君之所问..."
           @keydown.enter.exact.prevent="sendMessage"
           :disabled="loading || !canInteract"
           ref="messageInput"
@@ -124,7 +124,7 @@
           @click="sendMessage"
           class="send-btn"
         >
-          {{ loading ? '发送中...' : '发送' }}
+          {{ loading ? '传书中...' : '传书' }}
         </button>
       </div>
     </div>
@@ -639,19 +639,13 @@ export default {
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(260px, 320px) 1fr;
-  gap: 20px;
+  gap: 24px;
   padding: 24px 4vw 32px;
-  background: radial-gradient(circle at 25% 20%, rgba(112, 100, 255, 0.18), transparent 55%),
-    radial-gradient(circle at 80% 10%, rgba(45, 212, 191, 0.18), transparent 40%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(248, 249, 255, 0.8));
+  background: var(--bg-color);
   align-items: flex-start;
 }
 
 .session-list {
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(99, 102, 241, 0.12);
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -665,35 +659,40 @@ export default {
   display: flex;
   justify-content: space-between;
   gap: 14px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  border-bottom: 1px solid rgba(28, 28, 28, 0.08);
 }
 
 .session-list-header h2 {
   margin: 0 0 6px;
   font-size: 22px;
+  font-family: 'Noto Serif SC', serif;
+  color: var(--secondary);
+  font-weight: 600;
 }
 
 .session-list-header p {
   margin: 0;
   font-size: 13px;
   color: var(--text-muted);
+  line-height: 1.6;
 }
 
 .new-chat-btn {
-  padding: 12px 18px;
-  border-radius: 18px;
-  border: none;
-  background: linear-gradient(130deg, var(--primary), var(--secondary));
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--primary);
+  background: var(--primary);
   color: #fff;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 15px 30px rgba(112, 100, 255, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  font-family: 'Noto Serif SC', serif;
 }
 
 .new-chat-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 22px 36px rgba(112, 100, 255, 0.45);
+  background: var(--primary-dark);
+  box-shadow: var(--shadow-md);
 }
 
 .session-list-ul {
@@ -706,18 +705,19 @@ export default {
 
 .session-item {
   padding: 18px 24px;
-  border-left: 4px solid transparent;
+  border-left: 3px solid transparent;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .session-item + .session-item {
-  border-top: 1px solid rgba(15, 23, 42, 0.04);
+  border-top: 1px solid rgba(28, 28, 28, 0.04);
 }
 
 .session-name {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 15px;
+  font-family: 'Noto Serif SC', serif;
 }
 
 .session-model,
@@ -728,19 +728,16 @@ export default {
 }
 
 .session-item:hover {
-  background: rgba(112, 100, 255, 0.08);
+  background: rgba(157, 41, 51, 0.06);
+  border-left-color: var(--primary);
 }
 
 .session-item.active {
   border-left-color: var(--primary);
-  background: rgba(112, 100, 255, 0.12);
+  background: rgba(157, 41, 51, 0.1);
 }
 
 .chat-section {
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.08);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -753,11 +750,11 @@ export default {
 .top-bar {
   position: relative;
   z-index: 1;
-  padding: 18px 24px 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(28, 28, 28, 0.06);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .top-left {
@@ -770,13 +767,18 @@ export default {
 
 .top-heading h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
+  font-family: 'Noto Serif SC', serif;
+  color: var(--secondary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
 .top-heading p {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   color: var(--text-muted);
   font-size: 13px;
+  line-height: 1.6;
 }
 
 .top-actions {
@@ -800,46 +802,55 @@ export default {
 }
 
 .select-group label {
-  font-weight: 600;
-  color: var(--text-color);
+  font-weight: 500;
+  color: var(--secondary);
+  font-family: 'Noto Serif SC', serif;
 }
 
 .model-select {
-  border-radius: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(28, 28, 28, 0.15);
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.9);
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
   color: var(--text-color);
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(157, 41, 51, 0.08);
 }
 
 .chip-toggle {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
+  border: 1px solid rgba(28, 28, 28, 0.15);
+  border-radius: var(--radius-sm);
   padding: 8px 12px;
-  background: rgba(248, 249, 255, 0.8);
+  background: rgba(255, 255, 255, 0.6);
   color: var(--text-color);
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  min-width: 140px;
-  transition: 0.2s ease;
+  min-width: 120px;
+  transition: all 0.3s ease;
 }
 
 .chip-toggle .chip-indicator {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.2);
+  background: rgba(28, 28, 28, 0.2);
 }
 
 .chip-toggle .chip-indicator.google {
-  background: linear-gradient(135deg, #34a853, #fbbc04, #4285f4);
+  background: var(--jade);
 }
 
 .chip-toggle .chip-indicator.rag {
-  background: linear-gradient(135deg, #c084fc, #9333ea);
+  background: var(--secondary);
 }
 
 .chip-toggle .chip-text {
@@ -851,6 +862,8 @@ export default {
 
 .chip-toggle strong {
   font-size: 12px;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 500;
 }
 
 .chip-toggle small {
@@ -859,36 +872,53 @@ export default {
 }
 
 .chip-toggle.active {
-  border-color: transparent;
-  background: rgba(112, 100, 255, 0.14);
-  box-shadow: 0 15px 30px rgba(112, 100, 255, 0.25);
+  border-color: var(--primary);
+  background: rgba(157, 41, 51, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .back-btn,
 .sync-btn {
-  padding: 10px 20px;
-  border-radius: 18px;
-  border: none;
-  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.3s ease;
+  font-family: 'Noto Serif SC', serif;
 }
 
 .back-btn {
-  background: rgba(112, 100, 255, 0.12);
-  color: var(--primary-dark);
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+}
+
+.back-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(157, 41, 51, 0.05);
+  transform: translateY(-1px);
 }
 
 .sync-btn {
-  background: linear-gradient(120deg, var(--primary), var(--secondary));
+  background: var(--primary);
+  border: 1px solid var(--primary);
   color: #fff;
-  box-shadow: 0 15px 28px rgba(112, 100, 255, 0.35);
+  box-shadow: var(--shadow-sm);
+}
+
+.sync-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .sync-btn:disabled {
-  background: #cbd5f5;
+  background: rgba(157, 41, 51, 0.3);
+  border-color: rgba(157, 41, 51, 0.3);
   box-shadow: none;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.7);
   cursor: not-allowed;
 }
 
@@ -896,11 +926,13 @@ export default {
   position: relative;
   flex: 1;
   overflow-y: auto;
-  padding: 22px 26px;
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: linear-gradient(180deg, rgba(248, 250, 255, 0.92), rgba(236, 241, 255, 0.74));
+  gap: 16px;
+  background: linear-gradient(180deg, rgba(245, 239, 226, 0.3), rgba(250, 246, 237, 0.3));
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z' fill='%239D2933' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -914,29 +946,37 @@ export default {
 
 .message {
   max-width: 680px;
-  padding: 16px 20px;
-  border-radius: 16px;
-  line-height: 1.6;
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+  line-height: 1.8;
   font-size: 14px;
-  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.12);
+  box-shadow: var(--shadow-md);
   position: relative;
+  transition: all 0.3s ease;
+}
+
+.message:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .user-message {
   align-self: flex-end;
-  background: linear-gradient(135deg, #6d5bff, #3ec5ff);
+  background: linear-gradient(135deg, var(--cinnabar), var(--ochre));
   color: #fff;
+  border-bottom-right-radius: 2px;
 }
 
 .ai-message {
   align-self: flex-start;
   background: #ffffff;
-  color: #000000;
-  border: 1px solid rgba(15, 23, 42, 0.05);
+  color: var(--ink);
+  border: 1px solid rgba(28, 28, 28, 0.06);
+  border-bottom-left-radius: 2px;
 }
 
 .ai-message .message-content {
-  color: #000000;
+  color: var(--ink);
 }
 
 .ai-message :deep(.md-editor-preview),
@@ -944,18 +984,23 @@ export default {
 .ai-message :deep(.markdown-body),
 .ai-message :deep(.markdown-body p),
 .ai-message :deep(.markdown-body span) {
-  color: #000000;
+  color: var(--ink);
 }
 
 .message-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-size: 12px;
-  text-transform: uppercase;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 600;
   letter-spacing: 0.05em;
-  color: rgba(15, 23, 42, 0.6);
+  color: rgba(28, 28, 28, 0.6);
+}
+
+.user-message .message-header {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .message-content {
@@ -969,76 +1014,105 @@ export default {
 }
 
 .message-content :deep(pre) {
-  background: #0f172a;
-  color: #f8fafc;
-  border-radius: 12px;
+  background: var(--ink);
+  color: var(--ivory);
+  border-radius: var(--radius-sm);
   padding: 12px;
   overflow-x: auto;
+  border-left: 3px solid var(--gold);
 }
 
 .tts-btn {
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.15);
   color: inherit;
-  padding: 4px 12px;
+  padding: 4px 10px;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tts-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .streaming-indicator {
-  color: #22d3ee;
+  color: var(--gold);
   font-weight: 600;
 }
 
 .chat-input {
-  padding: 16px 22px 22px;
+  padding: 20px 24px 24px;
   display: flex;
   gap: 12px;
   align-items: flex-end;
   position: relative;
-  border-top: 1px solid rgba(15, 23, 42, 0.05);
-  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid rgba(28, 28, 28, 0.06);
+  background: var(--card-bg);
 }
 
 .chat-input textarea {
   flex: 1;
-  border-radius: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(28, 28, 28, 0.15);
   padding: 14px;
   resize: none;
   min-height: 56px;
   max-height: 180px;
-  background: rgba(248, 249, 255, 0.92);
-  box-shadow: inset 0 3px 8px rgba(15, 23, 42, 0.05);
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
   font-size: 14px;
+  font-family: inherit;
 }
 
 .chat-input textarea:focus {
-  border-color: rgba(112, 100, 255, 0.9);
-  box-shadow: 0 0 0 3px rgba(112, 100, 255, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(157, 41, 51, 0.08);
   outline: none;
 }
 
 .send-btn {
-  border-radius: 16px;
-  border: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--primary);
   padding: 12px 28px;
-  background: linear-gradient(120deg, var(--primary), var(--secondary));
+  background: var(--primary);
   color: #fff;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 14px 24px rgba(112, 100, 255, 0.3);
-  transition: transform 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  font-family: 'Noto Serif SC', serif;
+  letter-spacing: 0.1em;
+  position: relative;
+  overflow: hidden;
+}
+
+.send-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.send-btn:hover::before {
+  left: 100%;
 }
 
 .send-btn:disabled {
-  background: #cbd5f5;
+  background: rgba(157, 41, 51, 0.3);
+  border-color: rgba(157, 41, 51, 0.3);
   box-shadow: none;
   cursor: not-allowed;
 }
 
 .send-btn:not(:disabled):hover {
   transform: translateY(-2px);
+  background: var(--primary-dark);
+  box-shadow: var(--shadow-md);
 }
 
 .chat-input-hint {

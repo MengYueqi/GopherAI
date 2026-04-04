@@ -1,22 +1,22 @@
 <template>
   <div class="travel-planning-page">
-    <section class="input-panel glass-panel">
+    <section class="input-panel chinese-panel">
       <div class="panel-header">
         <div>
-          <span class="pill">Travel Planner</span>
-          <h1>AI 旅游规划助手</h1>
-          <p v-if="showInput">输入出发地、目的地、天数与偏好，我们会为你生成可执行的行程建议。</p>
-          <p v-else>为您生成的专属旅游行程方案</p>
+          <span class="chinese-tag">知行阁</span>
+          <h1>知行 · 游天下</h1>
+          <p v-if="showInput">输入出发地、目的地、天数与偏好，为您生成完备的出行方案。</p>
+          <p v-else>为您定制的专属旅行方案</p>
         </div>
-        <button type="button" class="back-btn" @click="$router.push('/menu')">← 返回</button>
+        <button type="button" class="back-btn" @click="$router.push('/menu')">← 返</button>
       </div>
 
       <template v-if="showInput">
-        <label for="travel-input" class="field-label">行程需求描述</label>
+        <label for="travel-input" class="field-label">行旅需求</label>
         <textarea
           id="travel-input"
           v-model="description"
-          placeholder="例如：从上海出发，7 天游云南，喜欢自然风景，预算 6k 左右"
+          placeholder="例如：自沪上出发，七日游滇，喜自然风光，预算六千左右"
           :disabled="loading"
           rows="6"
         ></textarea>
@@ -28,41 +28,41 @@
             :disabled="loading || !description.trim()"
             @click="submitAdvice"
           >
-            {{ loading ? '生成中…' : '生成行程' }}
+            {{ loading ? '运筹中…' : '策划行程' }}
           </button>
-          <span v-if="loading" class="timer">已用时 {{ elapsedSeconds }}s</span>
+          <span v-if="loading" class="timer">已用时 {{ elapsedSeconds }}秒</span>
         </div>
 
         <div class="empty-state">
-          <p>提交需求后，这里会展示 AI 返回的行程规划。</p>
+          <p>提交需求后，此处将展示生成的行程方案。</p>
         </div>
       </template>
 
       <template v-else>
         <div class="loading-state" v-if="loading">
           <div class="loading-spinner"></div>
-          <h3>正在为您生成行程方案...</h3>
-          <p>已用时 {{ elapsedSeconds }}s，请稍候</p>
+          <h3>正在为您运筹行程方案...</h3>
+          <p>已用时 {{ elapsedSeconds }}秒，请稍候</p>
         </div>
 
         <div class="result-card" v-else>
           <div class="result-header">
-            <h3>行程规划结果</h3>
+            <h3>行程方案</h3>
             <button type="button" class="secondary-btn" @click="resetToInput">
-              重新生成
+              重绘
             </button>
           </div>
 
           <template v-if="hasStructuredPlan">
             <div class="overview-grid">
               <section class="overview-card accent">
-                <p class="section-eyebrow">总体概括</p>
+                <p class="section-eyebrow">总览</p>
                 <p class="overview-text">{{ planData.overall_summary || '暂无总体概括' }}</p>
                 <p v-if="planData.notice" class="notice-text">{{ planData.notice }}</p>
               </section>
 
               <section class="overview-card">
-                <p class="section-eyebrow">机票价格</p>
+                <p class="section-eyebrow">票务信息</p>
                 <div class="flight-meta">
                   <span class="meta-chip">{{ planData.flight_price?.currency || '未提供币种' }}</span>
                   <span class="meta-chip">{{ planData.flight_price?.price_range || '暂无价格区间' }}</span>
@@ -77,15 +77,15 @@
 
             <section class="daily-section">
               <div class="section-title-row">
-                <p class="section-eyebrow">每日计划</p>
-                <span class="day-count">{{ planData.daily_plans.length }} 天</span>
+                <p class="section-eyebrow">每日行程</p>
+                <span class="day-count">{{ planData.daily_plans.length }} 日</span>
               </div>
 
               <div class="day-stack">
                 <article v-for="day in planData.daily_plans" :key="`${day.day}-${day.title}`" class="day-card">
                   <div class="day-heading">
                     <div>
-                      <span class="day-badge">Day {{ day.day || '-' }}</span>
+                      <span class="day-badge">第 {{ day.day || '-' }} 日</span>
                       <h4>{{ day.title || '当日安排' }}</h4>
                     </div>
                     <p class="route-text">{{ day.route || '暂无路线信息' }}</p>
@@ -141,7 +141,7 @@
             </section>
 
             <section v-if="planData.sources?.length" class="source-section">
-              <p class="section-eyebrow">来源信息</p>
+              <p class="section-eyebrow">参考资料</p>
               <ul class="source-list">
                 <li v-for="source in planData.sources" :key="source">{{ source }}</li>
               </ul>
@@ -320,6 +320,7 @@ export default {
   display: flex;
   justify-content: center;
   padding: 48px 6vw 64px;
+  background: var(--bg-color);
 }
 
 .panel-header {
@@ -327,52 +328,74 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
+  border-bottom: 1px solid rgba(28, 28, 28, 0.08);
+  padding-bottom: 20px;
 }
 
 .panel-header h1 {
-  margin: 6px 0 8px;
+  margin: 8px 0 12px;
+  font-family: 'Noto Serif SC', serif;
+  color: var(--secondary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 32px;
+}
+
+.panel-header p {
+  line-height: 1.7;
 }
 
 .input-panel {
-  padding: 36px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
   width: min(1120px, 100%);
 }
 
 .back-btn {
   align-self: flex-start;
-  border: none;
-  background: rgba(112, 100, 255, 0.12);
-  color: var(--primary-dark);
-  padding: 10px 16px;
-  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-color);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Noto Serif SC', serif;
 }
 
 .back-btn:hover {
-  background: rgba(112, 100, 255, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(157, 41, 51, 0.05);
 }
 
 .field-label {
-  font-weight: 600;
+  font-weight: 500;
+  font-family: 'Noto Serif SC', serif;
+  color: var(--secondary);
+  font-size: 16px;
 }
 
 textarea {
   width: 100%;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(99, 102, 241, 0.24);
-  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(28, 28, 28, 0.15);
+  padding: 16px;
   font-size: 15px;
   resize: vertical;
   min-height: 140px;
-  background: rgba(255, 255, 255, 0.9);
-  line-height: 1.6;
+  background: rgba(255, 255, 255, 0.8);
+  line-height: 1.8;
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 textarea:focus {
-  outline: 2px solid rgba(112, 100, 255, 0.35);
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(157, 41, 51, 0.08);
 }
 
 .actions {
@@ -384,68 +407,125 @@ textarea:focus {
 
 .primary-btn,
 .secondary-btn {
-  border: none;
-  border-radius: 14px;
-  padding: 12px 20px;
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Noto Serif SC', serif;
+  letter-spacing: 0.05em;
 }
 
 .primary-btn {
-  background: linear-gradient(120deg, var(--primary), var(--secondary));
+  border: 1px solid var(--primary);
+  background: var(--primary);
   color: #fff;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.primary-btn:hover::before {
+  left: 100%;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .primary-btn:disabled {
-  opacity: 0.5;
+  background: rgba(157, 41, 51, 0.3);
+  border-color: rgba(157, 41, 51, 0.3);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
 .secondary-btn {
-  background: rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--card-border);
+  background: transparent;
   color: var(--text-color);
 }
 
+.secondary-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(157, 41, 51, 0.05);
+  transform: translateY(-1px);
+}
+
 .result-card {
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.92);
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .result-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(28, 28, 28, 0.06);
+}
+
+.result-header h3 {
+  font-family: 'Noto Serif SC', serif;
+  color: var(--secondary);
+  font-weight: 600;
+  font-size: 24px;
 }
 
 .overview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 24px;
+  gap: 20px;
+  margin-bottom: 32px;
 }
 
 .overview-card {
-  border-radius: 20px;
-  padding: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 255, 0.98));
-  border: 1px solid rgba(99, 102, 241, 0.14);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .overview-card.accent {
-  background: linear-gradient(135deg, rgba(98, 116, 255, 0.12), rgba(89, 201, 169, 0.12));
+  background: linear-gradient(135deg, rgba(157, 41, 51, 0.08), rgba(212, 175, 55, 0.06));
+  border-left: 3px solid var(--primary);
 }
 
 .section-eyebrow {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--primary);
+  font-family: 'Noto Serif SC', serif;
+  border-left: 2px solid var(--primary);
+  padding-left: 8px;
 }
 
 .overview-text,
@@ -476,12 +556,14 @@ textarea:focus {
 .day-count {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   padding: 6px 12px;
   font-size: 12px;
-  font-weight: 700;
-  background: rgba(99, 102, 241, 0.1);
+  font-weight: 500;
+  background: rgba(157, 41, 51, 0.1);
   color: var(--primary-dark);
+  font-family: 'Noto Serif SC', serif;
+  border-left: 2px solid var(--primary);
 }
 
 .daily-section,
@@ -504,11 +586,34 @@ textarea:focus {
 }
 
 .day-card {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 24px;
-  padding: 22px;
-  background: #fff;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.day-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 0;
+  background: var(--secondary);
+  transition: height 0.3s ease;
+}
+
+.day-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.day-card:hover::before {
+  height: 100%;
 }
 
 .day-heading {
@@ -516,26 +621,35 @@ textarea:focus {
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .day-heading h4,
 .attraction-copy h5 {
   margin: 10px 0 0;
+  font-family: 'Noto Serif SC', serif;
+  color: var(--secondary);
+  font-weight: 600;
 }
 
 .attraction-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 18px;
+  margin-top: 20px;
 }
 
 .attraction-card {
-  border-radius: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.12);
-  padding: 18px;
-  background: rgba(248, 250, 255, 0.9);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(28, 28, 28, 0.08);
+  padding: 20px;
+  background: rgba(250, 246, 237, 0.3);
+  transition: all 0.3s ease;
+}
+
+.attraction-card:hover {
+  transform: translateX(4px);
+  border-color: var(--jade);
 }
 
 .attraction-copy p {
@@ -560,16 +674,16 @@ textarea:focus {
 .image-card {
   display: block;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   text-decoration: none;
   background: #fff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(28, 28, 28, 0.08);
+  transition: all 0.3s ease;
 }
 
 .image-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .image-card img {
@@ -577,7 +691,12 @@ textarea:focus {
   width: 100%;
   height: 180px;
   object-fit: cover;
-  background: rgba(148, 163, 184, 0.16);
+  background: rgba(28, 28, 28, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.image-card:hover img {
+  transform: scale(1.05);
 }
 
 .image-caption {
@@ -587,6 +706,12 @@ textarea:focus {
   padding: 12px;
   color: var(--text-color);
   font-size: 13px;
+  border-top: 1px solid rgba(28, 28, 28, 0.06);
+}
+
+.image-caption strong {
+  font-family: 'Noto Serif SC', serif;
+  color: var(--secondary);
 }
 
 .source-link {
