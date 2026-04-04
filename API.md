@@ -1,43 +1,150 @@
 # GopherAI API 文档
 
 ## 基础信息
-- 基础路径: `/api/v1`
-- 认证: `/AI` 和 `/image` 下接口需要 JWT（通过中间件 `jwt.Auth()`）
-- 数据格式: 除图片识别外，均为 `application/json`
+
+- 基础路径：`/api/v1`
+- 数据格式：除图片识别接口外，请求体均为 `application/json`
+- 鉴权范围：`/api/v1/AI` 与 `/api/v1/image` 下接口需要 JWT 鉴权
+- 鉴权方式：
+  - 推荐通过请求头传递：`Authorization: Bearer <token>`
+  - 也兼容通过 URL 参数传递：`?token=<token>`
+
+## 统一响应结构
+
+大部分非流式接口都会返回统一 JSON 结构：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success"
+}
+```
+
+常见字段说明：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| status_code | number | 业务状态码 |
+| status_msg | string | 状态描述 |
+
+常见状态码：
+
+| 状态码 | 含义 |
+| --- | --- |
+| 1000 | success |
+| 2001 | 请求参数错误 |
+| 2006 | 无效的Token |
+| 2008 | 验证码错误 |
+| 2009 | 记录不存在 |
+| 4001 | 服务繁忙 |
+| 5001 | 模型不存在 |
+| 5002 | 无法打开模型 |
+| 5003 | 模型运行失败 |
 
 ## 用户相关
-### POST /api/v1/user/register
-接口说明: 用户注册
-请求参数 (JSON):
+
+### POST `/api/v1/user/register`
+
+接口说明：用户注册，注册成功后直接返回登录 token。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | email | string | 是 | 邮箱 |
-| captcha | string | 否 | 验证码 |
+| captcha | string | 否 | 邮箱验证码 |
 | password | string | 否 | 密码 |
 
-### POST /api/v1/user/login
-接口说明: 用户登录
-请求参数 (JSON):
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "token": "xxx"
+}
+```
+
+### POST `/api/v1/user/login`
+
+接口说明：用户登录。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | username | string | 否 | 用户名 |
 | password | string | 否 | 密码 |
 
-### POST /api/v1/user/captcha
-接口说明: 发送验证码
-请求参数 (JSON):
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "token": "xxx"
+}
+```
+
+### POST `/api/v1/user/captcha`
+
+接口说明：发送邮箱验证码。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | email | string | 是 | 邮箱 |
 
-## AI 聊天相关 (需 JWT)
-### GET /api/v1/AI/chat/sessions
-接口说明: 获取当前用户会话列表
-请求参数: 无 (从 JWT 中获取 userName)
+响应示例：
 
-### POST /api/v1/AI/chat/send-new-session
-接口说明: 创建新会话并发送消息
-请求参数 (JSON):
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success"
+}
+```
+
+## AI 相关接口
+
+以下接口均需要 JWT。
+
+### GET `/api/v1/AI/chat/sessions`
+
+接口说明：获取当前登录用户的会话列表。用户信息从 JWT 中解析，不需要额外传参。
+
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "sessions": [
+    {
+      "sessionId": "session-uuid",
+      "name": "新的对话",
+      "modelType": "deepseek",
+      "updateAt": "2026-04-04T10:00:00Z"
+    }
+  ]
+}
+```
+
+返回字段说明：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| sessionId | string | 会话 ID |
+| name | string | 会话标题 |
+| modelType | string | 模型类型 |
+| updateAt | string | 最近更新时间 |
+
+### POST `/api/v1/AI/chat/send-new-session`
+
+接口说明：创建新会话并发送消息，返回 AI 回复和新会话 ID。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | question | string | 是 | 用户问题 |
@@ -45,56 +152,165 @@
 | usingGoogle | bool | 否 | 是否使用 Google 搜索 |
 | usingRAG | bool | 否 | 是否使用 RAG 检索 |
 
-### POST /api/v1/AI/chat/send
-接口说明: 向已有会话发送消息
-请求参数 (JSON):
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "Information": "AI 回复内容",
+  "sessionId": "session-uuid"
+}
+```
+
+### POST `/api/v1/AI/chat/send`
+
+接口说明：向已有会话发送消息并返回 AI 回复。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | question | string | 是 | 用户问题 |
 | modelType | string | 是 | 模型类型 |
-| sessionId | string | 是 | 当前会话 ID |
+| sessionId | string | 是 | 会话 ID |
 | usingGoogle | bool | 否 | 是否使用 Google 搜索 |
 | usingRAG | bool | 否 | 是否使用 RAG 检索 |
 
-### POST /api/v1/AI/chat/history
-接口说明: 获取聊天历史
-请求参数 (JSON):
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "Information": "AI 回复内容"
+}
+```
+
+### POST `/api/v1/AI/chat/history`
+
+接口说明：获取指定会话的聊天历史。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| sessionId | string | 是 | 当前会话 ID |
+| sessionId | string | 是 | 会话 ID |
 
-### POST /api/v1/AI/chat/send-stream-new-session
-接口说明: 创建新会话并以 SSE 方式流式返回回答
-请求参数 (JSON):
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "history": [
+    {
+      "is_user": true,
+      "content": "你好"
+    },
+    {
+      "is_user": false,
+      "content": "你好，有什么可以帮你？"
+    }
+  ]
+}
+```
+
+返回字段说明：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| is_user | bool | `true` 表示用户消息，`false` 表示 AI 消息 |
+| content | string | 消息内容 |
+
+### POST `/api/v1/AI/chat/send-stream-new-session`
+
+接口说明：创建新会话并以 SSE 方式流式返回回答。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | question | string | 是 | 用户问题 |
 | modelType | string | 是 | 模型类型 |
-| usingGoogle | bool | 否 | 是否使用 Google 搜索 |
-| usingRAG | bool | 否 | 是否使用 RAG 检索 |
+| usingGoogle | bool | 否 | 当前请求体中包含该字段，但流式处理逻辑未实际使用 |
+| usingRAG | bool | 否 | 当前请求体中包含该字段，但流式处理逻辑未实际使用 |
 
-### POST /api/v1/AI/chat/send-stream
-接口说明: 已有会话的 SSE 流式回答
-请求参数 (JSON):
+响应类型：`text/event-stream`
+
+说明：
+
+- 连接建立后，服务端会先发送一条 `data` 事件，下发新建的 `sessionId`
+- 随后继续推送模型生成内容
+- 失败时会发送 `error` 事件
+
+首条事件示例：
+
+```text
+data: {"sessionId": "session-uuid"}
+```
+
+### POST `/api/v1/AI/chat/send-stream`
+
+接口说明：向已有会话发送消息，并以 SSE 方式流式返回回答。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | question | string | 是 | 用户问题 |
 | modelType | string | 是 | 模型类型 |
-| sessionId | string | 是 | 当前会话 ID |
-| usingGoogle | bool | 否 | 是否使用 Google 搜索 |
-| usingRAG | bool | 否 | 是否使用 RAG 检索 |
+| sessionId | string | 是 | 会话 ID |
+| usingGoogle | bool | 否 | 当前请求体中包含该字段，但流式处理逻辑未实际使用 |
+| usingRAG | bool | 否 | 当前请求体中包含该字段，但流式处理逻辑未实际使用 |
 
-### POST /api/v1/AI/agent/medical_advice
-接口说明: 医疗建议生成
-请求参数 (JSON):
+响应类型：`text/event-stream`
+
+说明：
+
+- 服务端会持续输出流式内容
+- 失败时会发送 `error` 事件
+
+### POST `/api/v1/AI/agent/medical_advice`
+
+接口说明：根据症状描述生成医疗建议。
+
+请求参数：
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | description | string | 是 | 症状描述 |
 
-## 图片识别 (需 JWT)
-### POST /api/v1/image/recognize
-接口说明: 图片识别
-请求参数 (multipart/form-data):
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "advice": "建议内容"
+}
+```
+
+## 图片相关接口
+
+以下接口均需要 JWT。
+
+### POST `/api/v1/image/recognize`
+
+接口说明：上传图片并进行识别。
+
+请求参数：`multipart/form-data`
+
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | image | file | 是 | 图片文件 |
+
+响应示例：
+
+```json
+{
+  "status_code": 1000,
+  "status_msg": "success",
+  "class_name": "cat"
+}
+```
