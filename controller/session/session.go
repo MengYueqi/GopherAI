@@ -49,11 +49,11 @@ type (
 		History []model.History `json:"history"`
 		controller.Response
 	}
-	MedicalAdviceRequest struct {
+	TravelPlanRequest struct {
 		Description string `json:"description" binding:"required"` // 症状描述
 	}
-	MedicalAdviceResponse struct {
-		Advice model.TravelPlanPayload `json:"advice,omitempty"`
+	TravelPlanResponse struct {
+		Plan model.TravelPlanPayload `json:"plan,omitempty"`
 		controller.Response
 	}
 	CreateTravelPlanningTaskResponse struct {
@@ -81,27 +81,26 @@ func GetUserSessionsByUserName(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-func GenerateMedicalAdvice(c *gin.Context) {
-	req := new(MedicalAdviceRequest)
-	res := new(MedicalAdviceResponse)
+func GenerateTravelPlan(c *gin.Context) {
+	req := new(TravelPlanRequest)
+	res := new(TravelPlanResponse)
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusOK, res.CodeOf(code.CodeInvalidParams))
 		return
 	}
-	// 生成医疗建议
-	advice, code_ := session.GenerateMedicalAdvice(req.Description)
+	plan, code_ := session.GenerateTravelPlan(req.Description)
 
 	if code_ != code.CodeSuccess {
 		c.JSON(http.StatusOK, res.CodeOf(code_))
 		return
 	}
 	res.Success()
-	res.Advice = advice
+	res.Plan = plan
 	c.JSON(http.StatusOK, res)
 }
 
 func CreateTravelPlanningTask(c *gin.Context) {
-	req := new(MedicalAdviceRequest)
+	req := new(TravelPlanRequest)
 	res := new(CreateTravelPlanningTaskResponse)
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusOK, res.CodeOf(code.CodeInvalidParams))

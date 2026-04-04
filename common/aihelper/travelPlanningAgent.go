@@ -16,10 +16,10 @@ import (
 	"github.com/cloudwego/eino/schema"
 )
 
-const medicalRedFlagPromptPath = "common/tools/prompt/medical_red_flag_system.txt"
-const medicalRedFlagNoticePath = "common/tools/prompt/medical_red_flag_notice.txt"
-const medicalNoRedFlagNoticePath = "common/tools/prompt/medical_no_red_flag_notice.txt"
-const medicalSummaryPromptPath = "common/tools/prompt/medical_summary_prompt.txt"
+const travelRedFlagPromptPath = "common/tools/prompt/medical_red_flag_system.txt"
+const travelRedFlagNoticePath = "common/tools/prompt/medical_red_flag_notice.txt"
+const travelNoRedFlagNoticePath = "common/tools/prompt/medical_no_red_flag_notice.txt"
+const travelSummaryPromptPath = "common/tools/prompt/medical_summary_prompt.txt"
 const myBaseURL = "http://localhost:8081/sse"
 const flightBaseURL = "http://localhost:8082/sse"
 
@@ -41,14 +41,14 @@ func loadPromptFile(path string) (string, error) {
 	return content, nil
 }
 
-func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string, progressCb TravelPlanningProgressCallback) (*schema.Message, error) {
+func (o *OpenAIModel) TravelAgentResp(ctx context.Context, description string, progressCb TravelPlanningProgressCallback) (*schema.Message, error) {
 	g := compose.NewGraph[map[string]any, *schema.Message]()
-	systemPrompt, err := loadPromptFile(medicalRedFlagPromptPath)
+	systemPrompt, err := loadPromptFile(travelRedFlagPromptPath)
 	if err != nil {
 		log.Printf("ERROR: %v\n", err)
 		return nil, err
 	}
-	summaryPrompt, err := loadPromptFile(medicalSummaryPromptPath)
+	summaryPrompt, err := loadPromptFile(travelSummaryPromptPath)
 	if err != nil {
 		log.Printf("ERROR: %v\n", err)
 		return nil, err
@@ -85,7 +85,7 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string, 
 
 	_ = g.AddLambdaNode("plan_blocked_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res []*schema.Message, err error) {
 		log.Printf("Final plan feasibility result (blocked): %+v\n", input)
-		noticeTemplate, err := loadPromptFile(medicalRedFlagNoticePath)
+		noticeTemplate, err := loadPromptFile(travelRedFlagNoticePath)
 		if err != nil {
 			return nil, err
 		}
@@ -224,7 +224,7 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string, 
 
 	_ = g.AddLambdaNode("plan_allowed_condition", compose.InvokableLambda(func(ctx context.Context, input ModelJudgment) (res []*schema.Message, err error) {
 		log.Printf("Final plan feasibility result (allowed): %+v\n", input)
-		noticeTemplate, err := loadPromptFile(medicalNoRedFlagNoticePath)
+		noticeTemplate, err := loadPromptFile(travelNoRedFlagNoticePath)
 		if err != nil {
 			return nil, err
 		}

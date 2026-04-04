@@ -61,7 +61,7 @@ type TravelPlanningTaskSnapshot struct {
 	ProgressPercent   int                   `json:"progress_percent,omitempty"`
 	ErrorMessage      string                `json:"error_message,omitempty"`
 	Stages            []TravelPlanningStage `json:"stages,omitempty"`
-	Advice            TravelPlanPayload     `json:"advice,omitempty"`
+	Plan              TravelPlanPayload     `json:"plan,omitempty"`
 	CreatedAt         int64                 `json:"created_at,omitempty"`
 	UpdatedAt         int64                 `json:"updated_at,omitempty"`
 	CompletedAt       int64                 `json:"completed_at,omitempty"`

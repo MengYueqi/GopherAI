@@ -271,7 +271,7 @@ data: {"sessionId": "session-uuid"}
 - 服务端会持续输出流式内容
 - 失败时会发送 `error` 事件
 
-### POST `/api/v1/AI/agent/medical_advice`
+### POST `/api/v1/AI/agent/travel_plan`
 
 接口说明：根据旅行需求生成结构化旅游方案。
 
@@ -287,7 +287,7 @@ data: {"sessionId": "session-uuid"}
 {
   "status_code": 1000,
   "status_msg": "success",
-  "advice": {
+  "plan": {
     "mode": "plan",
     "overall_summary": "整体路线、节奏与核心建议概括",
     "flight_price": {

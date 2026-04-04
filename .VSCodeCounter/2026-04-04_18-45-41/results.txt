@@ -1,0 +1,194 @@
+Date : 2026-04-04 18:45:41
+Directory : /Users/mengfanxing/Documents/GopherAI
+Total : 96 files,  28741 codes, 734 comments, 2497 blanks, all 31972 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| JSON             |          3 |     14,561 |          0 |          2 |     14,563 |
+| Go               |         59 |      5,586 |        676 |        985 |      7,247 |
+| vue              |          8 |      3,915 |         26 |        535 |      4,476 |
+| Markdown         |          9 |      1,395 |          0 |        495 |      1,890 |
+| HTML             |          3 |      1,358 |         11 |        388 |      1,757 |
+| Go Checksum File |          2 |      1,275 |          0 |          2 |      1,277 |
+| JavaScript       |          6 |        199 |         18 |         25 |        242 |
+| Go Module File   |          2 |        171 |          0 |         12 |        183 |
+| Shell Script     |          2 |        161 |          3 |         27 |        191 |
+| Python           |          1 |         75 |          0 |         16 |         91 |
+| TOML             |          1 |         45 |          0 |         10 |         55 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                        | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                           |         96 |     28,741 |        734 |      2,497 |     31,972 |
+| . (Files)                                                                                                   |          5 |      1,712 |         15 |        166 |      1,893 |
+| common                                                                                                      |         39 |      5,299 |        560 |        835 |      6,694 |
+| common/aihelper                                                                                             |          7 |        970 |        274 |        184 |      1,428 |
+| common/code                                                                                                 |          1 |         47 |          2 |         15 |         64 |
+| common/email                                                                                                |          1 |         24 |          6 |          8 |         38 |
+| common/image                                                                                                |          3 |        128 |        197 |         57 |        382 |
+| common/mysql                                                                                                |          1 |         65 |          2 |         14 |         81 |
+| common/rabbitmq                                                                                             |          3 |        123 |         24 |         30 |        177 |
+| common/rag                                                                                                  |          2 |        200 |         16 |         36 |        252 |
+| common/redis                                                                                                |          2 |         61 |          5 |         16 |         82 |
+| common/tools                                                                                                |         19 |      3,681 |         34 |        475 |      4,190 |
+| common/tools (Files)                                                                                        |          3 |         73 |          5 |         19 |         97 |
+| common/tools/conversation_compression                                                                       |          1 |        242 |          7 |         37 |        286 |
+| common/tools/mcp                                                                                            |         15 |      3,366 |         22 |        419 |      3,807 |
+| common/tools/mcp/eino-mcp                                                                                   |         15 |      3,366 |         22 |        419 |      3,807 |
+| common/tools/mcp/eino-mcp (Files)                                                                           |          5 |        588 |          4 |        102 |        694 |
+| common/tools/mcp/eino-mcp/tools                                                                             |         10 |      2,778 |         18 |        317 |      3,113 |
+| common/tools/mcp/eino-mcp/tools (Files)                                                                     |          1 |        155 |          1 |         26 |        182 |
+| common/tools/mcp/eino-mcp/tools/mcp-chatbox                                                                 |          1 |        231 |          6 |         36 |        273 |
+| common/tools/mcp/eino-mcp/tools/mcp-flight                                                                  |          4 |      1,668 |          5 |         69 |      1,742 |
+| common/tools/mcp/eino-mcp/tools/mcp-flight (Files)                                                          |          2 |      1,478 |          5 |         28 |      1,511 |
+| common/tools/mcp/eino-mcp/tools/mcp-flight/mock                                                             |          2 |        190 |          0 |         41 |        231 |
+| common/tools/mcp/eino-mcp/tools/mcp-photo                                                                   |          3 |        568 |          0 |        159 |        727 |
+| common/tools/mcp/eino-mcp/tools/mcp-time                                                                    |          1 |        156 |          6 |         27 |        189 |
+| config                                                                                                      |          2 |        138 |          2 |         29 |        169 |
+| controller                                                                                                  |          4 |        347 |         17 |         68 |        432 |
+| controller (Files)                                                                                          |          1 |         17 |          0 |          5 |         22 |
+| controller/image                                                                                            |          1 |         35 |          0 |         10 |         45 |
+| controller/session                                                                                          |          1 |        215 |          8 |         36 |        259 |
+| controller/user                                                                                             |          1 |         80 |          9 |         17 |        106 |
+| dao                                                                                                         |          3 |         86 |          1 |         22 |        109 |
+| dao/message                                                                                                 |          1 |         27 |          0 |          6 |         33 |
+| dao/session                                                                                                 |          1 |         24 |          0 |          6 |         30 |
+| dao/user                                                                                                    |          1 |         35 |          1 |         10 |         46 |
+| data                                                                                                        |          2 |        161 |         13 |         31 |        205 |
+| data/script                                                                                                 |          2 |        161 |         13 |         31 |        205 |
+| middleware                                                                                                  |          1 |         36 |          2 |          8 |         46 |
+| middleware/jwt                                                                                              |          1 |         36 |          2 |          8 |         46 |
+| model                                                                                                       |          4 |        112 |          0 |         21 |        133 |
+| router                                                                                                      |          4 |         61 |          3 |         21 |         85 |
+| service                                                                                                     |          4 |        502 |         48 |         91 |        641 |
+| service/image                                                                                               |          1 |         19 |          1 |          5 |         25 |
+| service/session                                                                                             |          2 |        420 |         31 |         68 |        519 |
+| service/user                                                                                                |          1 |         63 |         16 |         18 |         97 |
+| test                                                                                                        |         11 |      2,790 |         30 |        639 |      3,459 |
+| test/conversation_compression                                                                               |          1 |         83 |          0 |         19 |        102 |
+| test/mock                                                                                                   |          3 |      1,153 |          0 |        198 |      1,351 |
+| test/rag                                                                                                    |          3 |        127 |          4 |         20 |        151 |
+| test/stress_test                                                                                            |          4 |      1,427 |         26 |        402 |      1,855 |
+| test/stress_test (Files)                                                                                    |          2 |         85 |         16 |         14 |        115 |
+| test/stress_test/result                                                                                     |          2 |      1,342 |         10 |        388 |      1,740 |
+| utils                                                                                                       |          2 |        109 |         14 |         18 |        141 |
+| utils (Files)                                                                                               |          1 |         74 |         12 |         11 |         97 |
+| utils/myjwt                                                                                                 |          1 |         35 |          2 |          7 |         44 |
+| vue-frontend                                                                                                |         15 |     17,388 |         29 |        548 |     17,965 |
+| vue-frontend (Files)                                                                                        |          3 |     13,357 |          0 |          2 |     13,359 |
+| vue-frontend/public                                                                                         |          1 |         16 |          1 |          0 |         17 |
+| vue-frontend/src                                                                                            |         11 |      4,015 |         28 |        546 |      4,589 |
+| vue-frontend/src (Files)                                                                                    |          2 |        264 |          0 |         47 |        311 |
+| vue-frontend/src/components                                                                                 |          1 |        243 |          0 |         38 |        281 |
+| vue-frontend/src/components/travel                                                                          |          1 |        243 |          0 |         38 |        281 |
+| vue-frontend/src/router                                                                                     |          1 |         60 |          0 |          5 |         65 |
+| vue-frontend/src/utils                                                                                      |          1 |         30 |          2 |          4 |         36 |
+| vue-frontend/src/views                                                                                      |          6 |      3,418 |         26 |        452 |      3,896 |
++-------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                                                                                    | language         | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| /Users/mengfanxing/Documents/GopherAI/API.md                                                                | Markdown         |        302 |          0 |         89 |        391 |
+| /Users/mengfanxing/Documents/GopherAI/README.md                                                             | Markdown         |        159 |          0 |         55 |        214 |
+| /Users/mengfanxing/Documents/GopherAI/common/aihelper/aihelper.go                                           | Go               |        119 |         31 |         28 |        178 |
+| /Users/mengfanxing/Documents/GopherAI/common/aihelper/factory.go                                            | Go               |         57 |         10 |         11 |         78 |
+| /Users/mengfanxing/Documents/GopherAI/common/aihelper/manager.go                                            | Go               |        116 |         13 |         30 |        159 |
+| /Users/mengfanxing/Documents/GopherAI/common/aihelper/mcp.go                                                | Go               |         24 |          1 |          4 |         29 |
+| /Users/mengfanxing/Documents/GopherAI/common/aihelper/model.go                                              | Go               |        214 |        144 |         63 |        421 |
+| /Users/mengfanxing/Documents/GopherAI/common/aihelper/travelAgent.go                                        | Go               |         65 |         64 |         20 |        149 |
+| /Users/mengfanxing/Documents/GopherAI/common/aihelper/travelPlanningAgent.go                                | Go               |        375 |         11 |         28 |        414 |
+| /Users/mengfanxing/Documents/GopherAI/common/code/code.go                                                   | Go               |         47 |          2 |         15 |         64 |
+| /Users/mengfanxing/Documents/GopherAI/common/email/email.go                                                 | Go               |         24 |          6 |          8 |         38 |
+| /Users/mengfanxing/Documents/GopherAI/common/image/image_recognizer.go                                      | Go               |         85 |          7 |         16 |        108 |
+| /Users/mengfanxing/Documents/GopherAI/common/image/image_recognizer_onnx.go                                 | Go               |          1 |        187 |         33 |        221 |
+| /Users/mengfanxing/Documents/GopherAI/common/image/qwen_model.go                                            | Go               |         42 |          3 |          8 |         53 |
+| /Users/mengfanxing/Documents/GopherAI/common/mysql/mysql.go                                                 | Go               |         65 |          2 |         14 |         81 |
+| /Users/mengfanxing/Documents/GopherAI/common/rabbitmq/init.go                                               | Go               |         11 |          4 |          7 |         22 |
+| /Users/mengfanxing/Documents/GopherAI/common/rabbitmq/meesage.go                                            | Go               |         38 |          1 |          6 |         45 |
+| /Users/mengfanxing/Documents/GopherAI/common/rabbitmq/rabbitmq.go                                           | Go               |         74 |         19 |         17 |        110 |
+| /Users/mengfanxing/Documents/GopherAI/common/rag/rag.go                                                     | Go               |        194 |         14 |         35 |        243 |
+| /Users/mengfanxing/Documents/GopherAI/common/rag/redis_init.sh                                              | Shell Script     |          6 |          2 |          1 |          9 |
+| /Users/mengfanxing/Documents/GopherAI/common/redis/key.go                                                   | Go               |          8 |          2 |          3 |         13 |
+| /Users/mengfanxing/Documents/GopherAI/common/redis/redis.go                                                 | Go               |         53 |          3 |         13 |         69 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/conversation_compression/compression.go                  | Go               |        242 |          7 |         37 |        286 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/google_model.go                                          | Go               |         18 |          1 |          5 |         24 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/CLAUDE.md                                   | Markdown         |         98 |          0 |         30 |        128 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/README.md                                   | Markdown         |        150 |          0 |         55 |        205 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/go.mod                                      | Go Module File   |         56 |          0 |          5 |         61 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/go.sum                                      | Go Checksum File |        213 |          0 |          1 |        214 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/main.go                                     | Go               |         71 |          4 |         11 |         86 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-chatbox/main.go                   | Go               |        231 |          6 |         36 |        273 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-flight/example_flight_return.json | JSON             |      1,218 |          0 |          0 |      1,218 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-flight/main.go                    | Go               |        260 |          5 |         28 |        293 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-flight/mock/README.md             | Markdown         |         45 |          0 |         21 |         66 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-flight/mock/main.go               | Go               |        145 |          0 |         20 |        165 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-photo/README.md                   | Markdown         |        184 |          0 |         96 |        280 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-photo/example_with_photo.md       | Markdown         |         41 |          0 |         22 |         63 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-photo/main.go                     | Go               |        343 |          0 |         41 |        384 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/mcp-time/main.go                      | Go               |        156 |          6 |         27 |        189 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/mcp/eino-mcp/tools/start_all.sh                          | Shell Script     |        155 |          1 |         26 |        182 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/tools.go                                                 | Go               |         29 |          3 |          9 |         41 |
+| /Users/mengfanxing/Documents/GopherAI/common/tools/vikingDB.go                                              | Go               |         26 |          1 |          5 |         32 |
+| /Users/mengfanxing/Documents/GopherAI/config/config.go                                                      | Go               |         93 |          2 |         19 |        114 |
+| /Users/mengfanxing/Documents/GopherAI/config/config.sample.toml                                             | TOML             |         45 |          0 |         10 |         55 |
+| /Users/mengfanxing/Documents/GopherAI/controller/common.go                                                  | Go               |         17 |          0 |          5 |         22 |
+| /Users/mengfanxing/Documents/GopherAI/controller/image/image.go                                             | Go               |         35 |          0 |         10 |         45 |
+| /Users/mengfanxing/Documents/GopherAI/controller/session/session.go                                         | Go               |        215 |          8 |         36 |        259 |
+| /Users/mengfanxing/Documents/GopherAI/controller/user/user.go                                               | Go               |         80 |          9 |         17 |        106 |
+| /Users/mengfanxing/Documents/GopherAI/dao/message/message.go                                                | Go               |         27 |          0 |          6 |         33 |
+| /Users/mengfanxing/Documents/GopherAI/dao/session/session.go                                                | Go               |         24 |          0 |          6 |         30 |
+| /Users/mengfanxing/Documents/GopherAI/dao/user/user.go                                                      | Go               |         35 |          1 |         10 |         46 |
+| /Users/mengfanxing/Documents/GopherAI/data/script/addDataToRedis.go                                         | Go               |         86 |         13 |         15 |        114 |
+| /Users/mengfanxing/Documents/GopherAI/data/script/preprocess.py                                             | Python           |         75 |          0 |         16 |         91 |
+| /Users/mengfanxing/Documents/GopherAI/go.mod                                                                | Go Module File   |        115 |          0 |          7 |        122 |
+| /Users/mengfanxing/Documents/GopherAI/go.sum                                                                | Go Checksum File |      1,062 |          0 |          1 |      1,063 |
+| /Users/mengfanxing/Documents/GopherAI/main.go                                                               | Go               |         74 |         15 |         14 |        103 |
+| /Users/mengfanxing/Documents/GopherAI/middleware/jwt/jwt.go                                                 | Go               |         36 |          2 |          8 |         46 |
+| /Users/mengfanxing/Documents/GopherAI/model/message.go                                                      | Go               |         16 |          0 |          4 |         20 |
+| /Users/mengfanxing/Documents/GopherAI/model/session.go                                                      | Go               |         20 |          0 |          5 |         25 |
+| /Users/mengfanxing/Documents/GopherAI/model/travel_plan.go                                                  | Go               |         61 |          0 |          8 |         69 |
+| /Users/mengfanxing/Documents/GopherAI/model/user.go                                                         | Go               |         15 |          0 |          4 |         19 |
+| /Users/mengfanxing/Documents/GopherAI/router/AI.go                                                          | Go               |         18 |          2 |          5 |         25 |
+| /Users/mengfanxing/Documents/GopherAI/router/Image.go                                                       | Go               |          8 |          0 |          5 |         13 |
+| /Users/mengfanxing/Documents/GopherAI/router/router.go                                                      | Go               |         23 |          1 |          7 |         31 |
+| /Users/mengfanxing/Documents/GopherAI/router/user.go                                                        | Go               |         12 |          0 |          4 |         16 |
+| /Users/mengfanxing/Documents/GopherAI/service/image/image.go                                                | Go               |         19 |          1 |          5 |         25 |
+| /Users/mengfanxing/Documents/GopherAI/service/session/session.go                                            | Go               |        212 |         31 |         43 |        286 |
+| /Users/mengfanxing/Documents/GopherAI/service/session/travel_task.go                                        | Go               |        208 |          0 |         25 |        233 |
+| /Users/mengfanxing/Documents/GopherAI/service/user/user.go                                                  | Go               |         63 |         16 |         18 |         97 |
+| /Users/mengfanxing/Documents/GopherAI/test/conversation_compression/compression_test.go                     | Go               |         83 |          0 |         19 |        102 |
+| /Users/mengfanxing/Documents/GopherAI/test/mock/API.md                                                      | Markdown         |        375 |          0 |        105 |        480 |
+| /Users/mengfanxing/Documents/GopherAI/test/mock/example_with_photo.md                                       | Markdown         |         41 |          0 |         22 |         63 |
+| /Users/mengfanxing/Documents/GopherAI/test/mock/main.go                                                     | Go               |        737 |          0 |         71 |        808 |
+| /Users/mengfanxing/Documents/GopherAI/test/rag/rag_add_test.go                                              | Go               |         57 |          1 |          9 |         67 |
+| /Users/mengfanxing/Documents/GopherAI/test/rag/rag_embed_test.go                                            | Go               |         23 |          0 |          6 |         29 |
+| /Users/mengfanxing/Documents/GopherAI/test/rag/rag_knn_test.go                                              | Go               |         47 |          3 |          5 |         55 |
+| /Users/mengfanxing/Documents/GopherAI/test/stress_test/chat_history.js                                      | JavaScript       |         40 |         11 |          7 |         58 |
+| /Users/mengfanxing/Documents/GopherAI/test/stress_test/login.js                                             | JavaScript       |         45 |          5 |          7 |         57 |
+| /Users/mengfanxing/Documents/GopherAI/test/stress_test/result/chat_history.html                             | HTML             |        671 |          5 |        194 |        870 |
+| /Users/mengfanxing/Documents/GopherAI/test/stress_test/result/login.html                                    | HTML             |        671 |          5 |        194 |        870 |
+| /Users/mengfanxing/Documents/GopherAI/utils/myjwt/jwt.go                                                    | Go               |         35 |          2 |          7 |         44 |
+| /Users/mengfanxing/Documents/GopherAI/utils/utils.go                                                        | Go               |         74 |         12 |         11 |         97 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/package-lock.json                                        | JSON             |     13,296 |          0 |          1 |     13,297 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/package.json                                             | JSON             |         47 |          0 |          1 |         48 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/public/index.html                                        | HTML             |         16 |          1 |          0 |         17 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/App.vue                                              | vue              |        254 |          0 |         45 |        299 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/components/travel/TravelPlanningProgress.vue         | vue              |        243 |          0 |         38 |        281 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/main.js                                              | JavaScript       |         10 |          0 |          2 |         12 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/router/index.js                                      | JavaScript       |         60 |          0 |          5 |         65 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/utils/api.js                                         | JavaScript       |         30 |          2 |          4 |         36 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/views/AIChat.vue                                     | vue              |        991 |         26 |        141 |      1,158 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/views/ImageRecognition.vue                           | vue              |        389 |          0 |         59 |        448 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/views/Login.vue                                      | vue              |        421 |          0 |         51 |        472 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/views/Menu.vue                                       | vue              |        405 |          0 |         49 |        454 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/views/Register.vue                                   | vue              |        425 |          0 |         45 |        470 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/src/views/TravelPlanning.vue                             | vue              |        787 |          0 |        107 |        894 |
+| /Users/mengfanxing/Documents/GopherAI/vue-frontend/vue.config.js                                            | JavaScript       |         14 |          0 |          0 |         14 |
+| Total                                                                                                       |                  |     28,741 |        734 |      2,497 |     31,972 |
++-------------------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+

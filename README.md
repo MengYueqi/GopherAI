@@ -73,9 +73,9 @@ flowchart TD
 | Redis Vector (Redis Stack) | `6381` | RAG 向量检索存储 | `common/rag/redis_docker_init.sh` |
 | Redis Stack UI | `8002` | Redis Stack Web UI | `common/rag/redis_docker_init.sh` |
 | RabbitMQ | `5672` | 异步消息/任务队列 | `config/config.toml` → `[rabbitmqConfig] port` |
-| MCP 工具服务（Time/Search） | `8081` | SSE 工具服务，URL: `http://localhost:8081/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
-| MCP Flight 工具服务 | `8082` | Google Flights 查询工具，URL: `http://localhost:8082/sse` | `common/aihelper/medicalAgent.go` → `flightBaseURL` |
-| MCP Chatbox 工具服务 | `8083` | SSE 工具服务，URL: `http://localhost:8083/sse` | `common/aihelper/medicalAgent.go` → `myBaseURL` |
+| MCP 工具服务（Time/Search） | `8081` | SSE 工具服务，URL: `http://localhost:8081/sse` | `common/aihelper/travelPlanningAgent.go` → `myBaseURL` |
+| MCP Flight 工具服务 | `8082` | Google Flights 查询工具，URL: `http://localhost:8082/sse` | `common/aihelper/travelPlanningAgent.go` → `flightBaseURL` |
+| MCP Chatbox 工具服务 | `8083` | SSE 工具服务，URL: `http://localhost:8083/sse` | `common/aihelper/model.go` → `myChatBoxMcpURL` |
 
 ## 📁 主要目录
 

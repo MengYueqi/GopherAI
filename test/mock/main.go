@@ -45,6 +45,7 @@ type sessionData struct {
 type mockServer struct {
 	mu       sync.RWMutex
 	sessions map[string]*sessionData
+	tasks    map[string]map[string]any
 	nextID   int
 }
 
@@ -82,7 +83,7 @@ type chatHistoryRequest struct {
 	SessionID string `json:"sessionId"`
 }
 
-type medicalAdviceRequest struct {
+type travelPlanRequest struct {
 	Description string `json:"description"`
 }
 
@@ -105,7 +106,9 @@ func main() {
 	mux.HandleFunc("/api/v1/AI/chat/history", srv.withCORS(srv.auth(srv.handleHistory)))
 	mux.HandleFunc("/api/v1/AI/chat/send-stream-new-session", srv.withCORS(srv.auth(srv.handleStreamNewSession)))
 	mux.HandleFunc("/api/v1/AI/chat/send-stream", srv.withCORS(srv.auth(srv.handleStreamSend)))
-	mux.HandleFunc("/api/v1/AI/agent/medical_advice", srv.withCORS(srv.auth(srv.handleMedicalAdvice)))
+	mux.HandleFunc("/api/v1/AI/agent/travel_plan", srv.withCORS(srv.auth(srv.handleTravelPlan)))
+	mux.HandleFunc("/api/v1/AI/agent/travel_plan/tasks", srv.withCORS(srv.auth(srv.handleTravelPlanTasks)))
+	mux.HandleFunc("/api/v1/AI/agent/travel_plan/tasks/", srv.withCORS(srv.auth(srv.handleTravelPlanTaskDetail)))
 	mux.HandleFunc("/api/v1/image/recognize", srv.withCORS(srv.auth(srv.handleRecognizeImage)))
 
 	addr := ":" + port
@@ -135,6 +138,7 @@ func newMockServer() *mockServer {
 				},
 			},
 		},
+		tasks:  map[string]map[string]any{},
 		nextID: 2,
 	}
 }
@@ -333,12 +337,12 @@ func (s *mockServer) handleHistory(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *mockServer) handleMedicalAdvice(w http.ResponseWriter, r *http.Request) {
+func (s *mockServer) handleTravelPlan(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeMethodNotAllowed(w)
 		return
 	}
-	var req medicalAdviceRequest
+	var req travelPlanRequest
 	if !decodeJSON(w, r, &req) {
 		return
 	}
@@ -350,7 +354,78 @@ func (s *mockServer) handleMedicalAdvice(w http.ResponseWriter, r *http.Request)
 	writeJSON(w, http.StatusOK, map[string]any{
 		"status_code": 1000,
 		"status_msg":  "success",
-		"advice":      buildMedicalAdviceMock(req.Description),
+		"plan":        buildTravelPlanMock(req.Description),
+	})
+}
+
+func (s *mockServer) handleTravelPlanTasks(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeMethodNotAllowed(w)
+		return
+	}
+	var req travelPlanRequest
+	if !decodeJSON(w, r, &req) {
+		return
+	}
+	if req.Description == "" {
+		writeJSON(w, http.StatusOK, response{StatusCode: 2001, StatusMsg: "请求参数错误"})
+		return
+	}
+
+	taskID := fmt.Sprintf("travel_task_%d", time.Now().UnixNano())
+	task := map[string]any{
+		"task_id":             taskID,
+		"state":               "succeeded",
+		"description":         req.Description,
+		"current_stage":       "json_structuring",
+		"current_stage_label": "结构化整理",
+		"current_detail":      "旅行规划已生成完成。",
+		"progress_percent":    100,
+		"stages": []map[string]any{
+			{"key": "feasibility_check", "label": "可行性评估", "status": "completed", "detail": "需求可行性判断已完成。"},
+			{"key": "overall_route", "label": "总体路线设计", "status": "completed", "detail": "总体路线已生成。"},
+			{"key": "flight_planning", "label": "机票信息分析", "status": "completed", "detail": "机票建议已生成。"},
+			{"key": "attraction_planning", "label": "景点亮点规划", "status": "completed", "detail": "景点亮点内容已整理。"},
+			{"key": "plan_summary", "label": "行程汇总成文", "status": "completed", "detail": "汇总摘要已生成。"},
+			{"key": "json_structuring", "label": "结构化整理", "status": "completed", "detail": "结构化结果已生成。"},
+		},
+		"plan": buildTravelPlanMock(req.Description),
+	}
+
+	s.mu.Lock()
+	s.tasks[taskID] = task
+	s.mu.Unlock()
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"status_code": 1000,
+		"status_msg":  "success",
+		"task":        task,
+	})
+}
+
+func (s *mockServer) handleTravelPlanTaskDetail(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeMethodNotAllowed(w)
+		return
+	}
+	taskID := strings.TrimPrefix(r.URL.Path, "/api/v1/AI/agent/travel_plan/tasks/")
+	if taskID == "" {
+		writeJSON(w, http.StatusOK, response{StatusCode: 2001, StatusMsg: "请求参数错误"})
+		return
+	}
+
+	s.mu.RLock()
+	task, ok := s.tasks[taskID]
+	s.mu.RUnlock()
+	if !ok {
+		writeJSON(w, http.StatusOK, response{StatusCode: 2001, StatusMsg: "请求参数错误"})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"status_code": 1000,
+		"status_msg":  "success",
+		"task":        task,
 	})
 }
 
@@ -552,7 +627,7 @@ func guessClassName(header *multipart.FileHeader) string {
 	}
 }
 
-func buildMedicalAdviceMock(description string) map[string]any {
+func buildTravelPlanMock(description string) map[string]any {
 	overallSummary := "东京 3 日行程以经典城市地标、商业街区和文化体验为主，节奏中等，适合第一次到东京旅行的用户。"
 	if strings.Contains(description, "大阪") || strings.Contains(strings.ToLower(description), "kansai") {
 		overallSummary = "关西 3 日行程以大阪城市体验为主，兼顾美食、商业街区与经典地标，适合首次体验关西都市风格的用户。"

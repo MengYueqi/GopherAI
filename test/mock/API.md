@@ -273,7 +273,7 @@ Authorization: Bearer mock-jwt-token
 }
 ```
 
-### POST `/api/v1/AI/agent/medical_advice`
+### POST `/api/v1/AI/agent/travel_plan`
 
 请求：
 
@@ -289,7 +289,7 @@ Authorization: Bearer mock-jwt-token
 {
   "status_code": 1000,
   "status_msg": "success",
-  "advice": {
+  "plan": {
     "mode": "plan",
     "overall_summary": "东京 3 日行程以经典城市地标、商业街区和文化体验为主，节奏中等，适合第一次到东京旅行的用户。",
     "flight_price": {
@@ -345,12 +345,12 @@ Authorization: Bearer mock-jwt-token
 
 结构说明：
 
-- `advice.mode = "plan"` 表示结构化旅游方案
-- `advice.overall_summary` 用于顶部总览
-- `advice.flight_price` 用于机票价格卡片
-- `advice.daily_plans` 用于每日行程渲染
-- `advice.daily_plans[].attractions[].images` 用于图片展示
-- `advice.sources` 用于来源信息展示
+- `plan.mode = "plan"` 表示结构化旅游方案
+- `plan.overall_summary` 用于顶部总览
+- `plan.flight_price` 用于机票价格卡片
+- `plan.daily_plans` 用于每日行程渲染
+- `plan.daily_plans[].attractions[].images` 用于图片展示
+- `plan.sources` 用于来源信息展示
 - 如果后端回退失败兜底，可返回 `mode: "raw"` 和 `raw_text`
 
 ## 流式接口 Mock

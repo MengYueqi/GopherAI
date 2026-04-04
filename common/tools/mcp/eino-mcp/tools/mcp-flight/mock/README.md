@@ -32,7 +32,7 @@ http://localhost:8082/sse
 
 ## 项目中的使用方式
 
-你当前项目里 [medicalAgent.go](/Users/mengfanxing/Documents/GopherAI/common/aihelper/medicalAgent.go) 已经把航班 MCP 地址写成：
+你当前项目里 [travelPlanningAgent.go](/Users/mengfanxing/Documents/GopherAI/common/aihelper/travelPlanningAgent.go) 已经把航班 MCP 地址写成：
 
 ```go
 const flightBaseURL = "http://localhost:8082/sse"

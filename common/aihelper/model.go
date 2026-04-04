@@ -34,8 +34,8 @@ const myChatBoxMcpURL = "http://localhost:8083/sse"
 type AIModel interface {
 	GenerateResponse(ctx context.Context, messages []*schema.Message, opts ...ToolOption) (*schema.Message, error)
 	StreamResponse(ctx context.Context, messages []*schema.Message, cb StreamCallback) (string, error)
-	GenerateMedicalAdviceResponse(ctx context.Context, messages string) (*schema.Message, error)
-	GenerateMedicalAdviceResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error)
+	GenerateTravelPlanResponse(ctx context.Context, messages string) (*schema.Message, error)
+	GenerateTravelPlanResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error)
 	GetModelType() string
 }
 
@@ -310,12 +310,12 @@ func (o *OpenAIModel) GenerateResponse(ctx context.Context, messages []*schema.M
 // 	return resp, nil
 // }
 
-func (o *OpenAIModel) GenerateMedicalAdviceResponse(ctx context.Context, messages string) (*schema.Message, error) {
-	return o.GenerateMedicalAdviceResponseWithProgress(ctx, messages, nil)
+func (o *OpenAIModel) GenerateTravelPlanResponse(ctx context.Context, messages string) (*schema.Message, error) {
+	return o.GenerateTravelPlanResponseWithProgress(ctx, messages, nil)
 }
 
-func (o *OpenAIModel) GenerateMedicalAdviceResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error) {
-	return o.MedicalAgentResp(ctx, messages, cb)
+func (o *OpenAIModel) GenerateTravelPlanResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error) {
+	return o.TravelAgentResp(ctx, messages, cb)
 }
 
 func (o *OpenAIModel) StreamResponse(ctx context.Context, messages []*schema.Message, cb StreamCallback) (string, error) {
@@ -399,11 +399,11 @@ func (o *OllamaModel) StreamResponse(ctx context.Context, messages []*schema.Mes
 
 func (o *OllamaModel) GetModelType() string { return "ollama" }
 
-func (o *OllamaModel) GenerateMedicalAdviceResponse(ctx context.Context, messages string) (*schema.Message, error) {
-	return o.GenerateMedicalAdviceResponseWithProgress(ctx, messages, nil)
+func (o *OllamaModel) GenerateTravelPlanResponse(ctx context.Context, messages string) (*schema.Message, error) {
+	return o.GenerateTravelPlanResponseWithProgress(ctx, messages, nil)
 }
 
-func (o *OllamaModel) GenerateMedicalAdviceResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error) {
+func (o *OllamaModel) GenerateTravelPlanResponseWithProgress(ctx context.Context, messages string, cb TravelPlanningProgressCallback) (*schema.Message, error) {
 	if cb != nil {
 		cb(TravelPlanningProgress{
 			Stage:   "json_structuring",

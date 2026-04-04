@@ -86,7 +86,7 @@ func runTravelPlanningTask(taskID string, description string) {
 	config := map[string]interface{}{
 		"apiKey": "your-api-key",
 	}
-	helper, err := manager.GetOrCreateAIHelper("system", "medical_advice_session", modelType, config)
+	helper, err := manager.GetOrCreateAIHelper("system", "travel_planning_session", modelType, config)
 	if err != nil {
 		log.Println("runTravelPlanningTask GetOrCreateAIHelper error:", err)
 		failTravelTask(taskID, "初始化规划助手失败。")
@@ -99,11 +99,11 @@ func runTravelPlanningTask(taskID string, description string) {
 		task.UpdatedAt = time.Now().Unix()
 	})
 
-	aiResponse, err := helper.GenerateMedicalAdviceResponseWithProgress(context.Background(), description, func(progress aihelper.TravelPlanningProgress) {
+	aiResponse, err := helper.GenerateTravelPlanResponseWithProgress(context.Background(), description, func(progress aihelper.TravelPlanningProgress) {
 		applyTravelTaskProgress(taskID, progress)
 	})
 	if err != nil {
-		log.Println("runTravelPlanningTask GenerateMedicalAdviceResponseWithProgress error:", err)
+		log.Println("runTravelPlanningTask GenerateTravelPlanResponseWithProgress error:", err)
 		failTravelTask(taskID, "生成旅行规划失败，请稍后重试。")
 		return
 	}
@@ -113,7 +113,7 @@ func runTravelPlanningTask(taskID string, description string) {
 		now := time.Now().Unix()
 		task.State = travelTaskStateSucceeded
 		task.ProgressPercent = 100
-		task.Advice = payload
+		task.Plan = payload
 		task.CompletedAt = now
 		task.UpdatedAt = now
 		if payload.Mode == "raw" {
@@ -219,14 +219,14 @@ func cloneTravelTask(task *model.TravelPlanningTaskSnapshot) model.TravelPlannin
 	if task.Stages != nil {
 		cloned.Stages = append([]model.TravelPlanningStage(nil), task.Stages...)
 	}
-	if task.Advice.DailyPlans != nil {
-		cloned.Advice.DailyPlans = append([]model.TravelDayPlan(nil), task.Advice.DailyPlans...)
+	if task.Plan.DailyPlans != nil {
+		cloned.Plan.DailyPlans = append([]model.TravelDayPlan(nil), task.Plan.DailyPlans...)
 	}
-	if task.Advice.Sources != nil {
-		cloned.Advice.Sources = append([]string(nil), task.Advice.Sources...)
+	if task.Plan.Sources != nil {
+		cloned.Plan.Sources = append([]string(nil), task.Plan.Sources...)
 	}
-	if task.Advice.FlightPrice.BookingTips != nil {
-		cloned.Advice.FlightPrice.BookingTips = append([]string(nil), task.Advice.FlightPrice.BookingTips...)
+	if task.Plan.FlightPrice.BookingTips != nil {
+		cloned.Plan.FlightPrice.BookingTips = append([]string(nil), task.Plan.FlightPrice.BookingTips...)
 	}
 	return cloned
 }

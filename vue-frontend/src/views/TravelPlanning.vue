@@ -209,7 +209,7 @@ const createEmptyTask = () => ({
   progress_percent: 0,
   error_message: '',
   stages: [],
-  advice: createEmptyPlan()
+  plan: createEmptyPlan()
 })
 
 const normalizePlan = (payload) => {
@@ -307,7 +307,7 @@ export default {
     }
 
     const fetchTaskStatus = async (taskId) => {
-      const response = await api.get(`/AI/agent/medical_advice/tasks/${taskId}`)
+      const response = await api.get(`/AI/agent/travel_plan/tasks/${taskId}`)
       if (!response.data || response.data.status_code !== 1000) {
         throw new Error(response.data?.status_msg || '无法获取规划进度')
       }
@@ -315,8 +315,8 @@ export default {
       applyTaskSnapshot(task)
 
       if (task.state === 'succeeded') {
-        planData.value = normalizePlan(task.advice)
-        rawAdvice.value = task.advice?.raw_text || ''
+        planData.value = normalizePlan(task.plan)
+        rawAdvice.value = task.plan?.raw_text || ''
         loading.value = false
         stopPolling()
         stopTimer()
@@ -349,7 +349,7 @@ export default {
       startTimer()
       try {
         const payload = { description: description.value.trim() }
-        const response = await api.post('/AI/agent/medical_advice/tasks', payload)
+        const response = await api.post('/AI/agent/travel_plan/tasks', payload)
 
         if (!response.data || response.data.status_code !== 1000) {
           throw new Error(response.data?.status_msg || '生成失败，请稍后再试')

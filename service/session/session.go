@@ -95,23 +95,23 @@ func CreateStreamSessionOnly(userName string, userQuestion string) (string, code
 	return createdSession.ID, code.CodeSuccess
 }
 
-func GenerateMedicalAdvice(description string) (model.TravelPlanPayload, code.Code) {
+func GenerateTravelPlan(description string) (model.TravelPlanPayload, code.Code) {
 	//2：获取AI模型
 	manager := aihelper.GetGlobalManager()
 	modelType := "1" // TODO: 目前写死为OpenAI模型，后续可以扩展
 	config := map[string]interface{}{
 		"apiKey": "your-api-key", // TODO: 从配置中获取
 	}
-	helper, err := manager.GetOrCreateAIHelper("system", "medical_advice_session", modelType, config)
+	helper, err := manager.GetOrCreateAIHelper("system", "travel_planning_session", modelType, config)
 	if err != nil {
-		log.Println("GenerateMedicalAdvice GetOrCreateAIHelper error:", err)
+		log.Println("GenerateTravelPlan GetOrCreateAIHelper error:", err)
 		return model.TravelPlanPayload{}, code.AIModelFail
 	}
 
-	//3：生成医疗建议
-	aiResponse, err_ := helper.GenerateMedicalAdviceResponse(ctx, description)
+	//3：生成旅行规划
+	aiResponse, err_ := helper.GenerateTravelPlanResponse(ctx, description)
 	if err_ != nil {
-		log.Println("GenerateMedicalAdvice GenerateMedicalAdviceResponse error:", err_)
+		log.Println("GenerateTravelPlan GenerateTravelPlanResponse error:", err_)
 		return model.TravelPlanPayload{}, code.AIModelFail
 	}
 

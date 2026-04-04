@@ -106,8 +106,8 @@ func (a *AIHelper) GenerateResponse(userName string, ctx context.Context, userQu
 	return modelMsg, nil
 }
 
-// 生成专业医疗建议
-func (a *AIHelper) GenerateMedicalAdviceResponse(ctx context.Context, description string) (*model.Message, error) {
+// 生成旅游规划
+func (a *AIHelper) GenerateTravelPlanResponse(ctx context.Context, description string) (*model.Message, error) {
 	// //构建消息
 	// messages := []*schema.Message{
 	// 	{
@@ -116,7 +116,7 @@ func (a *AIHelper) GenerateMedicalAdviceResponse(ctx context.Context, descriptio
 	// 	},
 	// }
 	//调用模型生成回复
-	schemaMsg, err := a.model.GenerateMedicalAdviceResponse(ctx, description)
+	schemaMsg, err := a.model.GenerateTravelPlanResponse(ctx, description)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +127,8 @@ func (a *AIHelper) GenerateMedicalAdviceResponse(ctx context.Context, descriptio
 	return modelMsg, nil
 }
 
-func (a *AIHelper) GenerateMedicalAdviceResponseWithProgress(ctx context.Context, description string, cb TravelPlanningProgressCallback) (*model.Message, error) {
-	schemaMsg, err := a.model.GenerateMedicalAdviceResponseWithProgress(ctx, description, cb)
+func (a *AIHelper) GenerateTravelPlanResponseWithProgress(ctx context.Context, description string, cb TravelPlanningProgressCallback) (*model.Message, error) {
+	schemaMsg, err := a.model.GenerateTravelPlanResponseWithProgress(ctx, description, cb)
 	if err != nil {
 		return nil, err
 	}
