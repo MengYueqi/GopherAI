@@ -53,7 +53,7 @@ type (
 		Description string `json:"description" binding:"required"` // 症状描述
 	}
 	MedicalAdviceResponse struct {
-		Advice string `json:"advice,omitempty"` // 医疗建议
+		Advice model.TravelPlanPayload `json:"advice,omitempty"`
 		controller.Response
 	}
 )

@@ -3,10 +3,13 @@ package aihelper
 import (
 	"context"
 
+	"github.com/cloudwego/eino-ext/components/tool/mcp"
 	"github.com/cloudwego/eino/adk"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/compose"
 )
+
+const photoBaseURL = "http://localhost:8084/sse"
 
 // 总体路线构建 Agent
 func (o *OpenAIModel) NewOverallRoutePlannerAgent(ctx context.Context, tools []tool.BaseTool) (adk.Agent, error) {
@@ -46,13 +49,22 @@ func (o *OpenAIModel) NewFlightAdvisorAgent(ctx context.Context, tools []tool.Ba
 
 // 重要景点介绍生成 Agent
 func (o *OpenAIModel) NewAttractionHighlightsAgent(ctx context.Context, tools []tool.BaseTool) (adk.Agent, error) {
+	photoCli, err := initMCPClient(ctx, photoBaseURL)
+	if err != nil {
+		return nil, err
+	}
+	photoTools, err := mcp.GetTools(ctx, &mcp.Config{Cli: photoCli})
+	if err != nil {
+		return nil, err
+	}
+
 	a, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
 		Name:        "DailyItineraryBuilder",
 		Description: "生成重要景点介绍",
-		Instruction: "你是重要景点介绍助手。根据目的地与用户偏好，精选关键景点在特定的部分进行介绍。介绍要尽量详细，包含历史背景、文化意义和独特体验，帮助用户了解景点亮点。如果调用了检索工具，请将信息来源附加在回答的最后。",
+		Instruction: "你是重要景点介绍助手。根据目的地与用户偏好，精选关键景点在特定的部分进行介绍。介绍要尽量详细，包含历史背景、文化意义和独特体验，帮助用户了解景点亮点。除了文字介绍外，你还需要主动使用可用的 MCP 图片工具为核心景点补充配图信息。优先调用 `search_photos` 之类的图片搜索工具，为每个重点景点查询 1 到 3 张高相关图片；查询词应尽量具体，包含景点名、城市名或国家名，避免过于宽泛。如果最终行程按天组织，那么每天的景点部分都必须包含对应的图片介绍，不能只给其中一天添加图片而忽略其他天；每一天至少为当天最核心的 1 到 2 个景点补充图片或图片链接。将最终结果组织为 Markdown：每个景点先给出文字介绍，再附上图片小节。图片小节中尽量直接给出可渲染的 Markdown 图片或图片链接，并简要标注图片主题或摄影来源。如果图片工具未返回结果，要明确说明该景点暂未找到合适图片，但仍保留完整景点介绍。不要伪造图片链接、图片作者或图片来源；只有在工具真实返回时才能输出对应内容。如果调用了检索工具或图片工具，请将信息来源附加在回答的最后。",
 		Model:       o.llm,
 		ToolsConfig: adk.ToolsConfig{
-			ToolsNodeConfig: compose.ToolsNodeConfig{Tools: tools},
+			ToolsNodeConfig: compose.ToolsNodeConfig{Tools: photoTools},
 		},
 		MaxIterations: 50,
 	})

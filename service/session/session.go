@@ -7,8 +7,10 @@ import (
 
 	"GopherAI/model"
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	// "github.com/cloudwego/eino/schema"
 	"github.com/google/uuid"
@@ -93,7 +95,7 @@ func CreateStreamSessionOnly(userName string, userQuestion string) (string, code
 	return createdSession.ID, code.CodeSuccess
 }
 
-func GenerateMedicalAdvice(description string) (string, code.Code) {
+func GenerateMedicalAdvice(description string) (model.TravelPlanPayload, code.Code) {
 	//2：获取AI模型
 	manager := aihelper.GetGlobalManager()
 	modelType := "1" // TODO: 目前写死为OpenAI模型，后续可以扩展
@@ -103,17 +105,70 @@ func GenerateMedicalAdvice(description string) (string, code.Code) {
 	helper, err := manager.GetOrCreateAIHelper("system", "medical_advice_session", modelType, config)
 	if err != nil {
 		log.Println("GenerateMedicalAdvice GetOrCreateAIHelper error:", err)
-		return "", code.AIModelFail
+		return model.TravelPlanPayload{}, code.AIModelFail
 	}
 
 	//3：生成医疗建议
 	aiResponse, err_ := helper.GenerateMedicalAdviceResponse(ctx, description)
 	if err_ != nil {
 		log.Println("GenerateMedicalAdvice GenerateMedicalAdviceResponse error:", err_)
-		return "", code.AIModelFail
+		return model.TravelPlanPayload{}, code.AIModelFail
 	}
 
-	return aiResponse.Content, code.CodeSuccess
+	return parseTravelPlanPayload(aiResponse.Content), code.CodeSuccess
+}
+
+func parseTravelPlanPayload(content string) model.TravelPlanPayload {
+	cleaned := strings.TrimSpace(content)
+	cleaned = strings.TrimPrefix(cleaned, "```json")
+	cleaned = strings.TrimPrefix(cleaned, "```")
+	cleaned = strings.TrimSuffix(cleaned, "```")
+	cleaned = strings.TrimSpace(cleaned)
+
+	start := strings.Index(cleaned, "{")
+	end := strings.LastIndex(cleaned, "}")
+	if start >= 0 && end >= start {
+		cleaned = cleaned[start : end+1]
+	}
+
+	var payload model.TravelPlanPayload
+	if err := json.Unmarshal([]byte(cleaned), &payload); err == nil {
+		if payload.Mode == "" {
+			payload.Mode = "plan"
+		}
+		if payload.DailyPlans == nil {
+			payload.DailyPlans = []model.TravelDayPlan{}
+		}
+		if payload.Sources == nil {
+			payload.Sources = []string{}
+		}
+		if payload.FlightPrice.BookingTips == nil {
+			payload.FlightPrice.BookingTips = []string{}
+		}
+		for i := range payload.DailyPlans {
+			if payload.DailyPlans[i].Attractions == nil {
+				payload.DailyPlans[i].Attractions = []model.TravelAttraction{}
+			}
+			if payload.DailyPlans[i].Tips == nil {
+				payload.DailyPlans[i].Tips = []string{}
+			}
+			for j := range payload.DailyPlans[i].Attractions {
+				if payload.DailyPlans[i].Attractions[j].Highlights == nil {
+					payload.DailyPlans[i].Attractions[j].Highlights = []string{}
+				}
+				if payload.DailyPlans[i].Attractions[j].Images == nil {
+					payload.DailyPlans[i].Attractions[j].Images = []model.TravelImageAsset{}
+				}
+			}
+		}
+		return payload
+	}
+
+	return model.TravelPlanPayload{
+		Mode:    "raw",
+		Notice:  "模型未返回可解析的结构化 JSON，已回退为原始文本。",
+		RawText: content,
+	}
 }
 
 func StreamMessageToExistingSession(userName string, sessionID string, userQuestion string, modelType string, writer http.ResponseWriter) code.Code {

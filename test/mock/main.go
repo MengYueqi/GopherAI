@@ -347,16 +347,10 @@ func (s *mockServer) handleMedicalAdvice(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	advice, err := loadMedicalAdviceMock()
-	if err != nil {
-		writeJSON(w, http.StatusOK, response{StatusCode: 4001, StatusMsg: "服务繁忙"})
-		return
-	}
-
 	writeJSON(w, http.StatusOK, map[string]any{
 		"status_code": 1000,
 		"status_msg":  "success",
-		"advice":      advice,
+		"advice":      buildMedicalAdviceMock(req.Description),
 	})
 }
 
@@ -558,20 +552,152 @@ func guessClassName(header *multipart.FileHeader) string {
 	}
 }
 
-func loadMedicalAdviceMock() (string, error) {
-	candidates := []string{
-		"example_with_photo.md",
-		"test/mock/example_with_photo.md",
+func buildMedicalAdviceMock(description string) map[string]any {
+	overallSummary := "东京 3 日行程以经典城市地标、商业街区和文化体验为主，节奏中等，适合第一次到东京旅行的用户。"
+	if strings.Contains(description, "大阪") || strings.Contains(strings.ToLower(description), "kansai") {
+		overallSummary = "关西 3 日行程以大阪城市体验为主，兼顾美食、商业街区与经典地标，适合首次体验关西都市风格的用户。"
 	}
 
-	for _, path := range candidates {
-		content, err := os.ReadFile(path)
-		if err == nil {
-			return string(content), nil
-		}
+	dailyPlans := []map[string]any{
+		{
+			"day":       1,
+			"title":     "浅草与东京晴空塔",
+			"route":     "浅草寺 -> 仲见世商店街 -> 隅田公园 -> 东京晴空塔",
+			"transport": "地铁 + 步行",
+			"summary":   "第一天适合从东京传统街区开始，感受寺庙文化与城市天际线。",
+			"attractions": []map[string]any{
+				{
+					"name":        "浅草寺",
+					"description": "东京代表性的历史寺庙，适合体验传统建筑、参拜文化与街区氛围。",
+					"highlights":  []string{"雷门地标", "传统参道氛围", "适合拍照与体验和风街景"},
+					"images": []map[string]any{
+						{
+							"title":      "浅草寺正门",
+							"url":        "https://images.unsplash.com/photo-1542051841857-5f90071e7989",
+							"source":     "Unsplash",
+							"source_url": "https://unsplash.com/photos/OQMZwNd3ThU",
+						},
+						{
+							"title":      "东京浅草街景",
+							"url":        "https://images.unsplash.com/photo-1513407030348-c983a97b98d8",
+							"source":     "Unsplash",
+							"source_url": "https://unsplash.com/photos/6I2dlBS1ewg",
+						},
+					},
+				},
+				{
+					"name":        "东京晴空塔",
+					"description": "俯瞰东京城市景观的标志性塔楼，夜景和黄昏时段尤其适合安排。",
+					"highlights":  []string{"东京全景", "夜景优秀", "适合与浅草区域联动安排"},
+					"images": []map[string]any{
+						{
+							"title":      "东京晴空塔远景",
+							"url":        "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc",
+							"source":     "Unsplash",
+							"source_url": "https://unsplash.com/photos/twukN12EN7c",
+						},
+					},
+				},
+			},
+			"tips": []string{"浅草区域建议上午前往，人流更可控", "晴空塔建议提前预约傍晚时段"},
+		},
+		{
+			"day":       2,
+			"title":     "涩谷与原宿城市活力线",
+			"route":     "涩谷十字路口 -> SHIBUYA SKY -> 表参道 -> 原宿竹下通",
+			"transport": "JR + 步行",
+			"summary":   "第二天以东京现代商业和潮流文化为主，适合逛街、拍照和夜景体验。",
+			"attractions": []map[string]any{
+				{
+					"name":        "涩谷十字路口",
+					"description": "东京都市感最强的代表场景之一，适合感受城市节奏。",
+					"highlights":  []string{"城市地标", "人流视效强", "适合夜景与街头摄影"},
+					"images": []map[string]any{
+						{
+							"title":      "涩谷街头夜景",
+							"url":        "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf",
+							"source":     "Unsplash",
+							"source_url": "https://unsplash.com/photos/JmuyB_LibRo",
+						},
+					},
+				},
+				{
+					"name":        "原宿竹下通",
+					"description": "适合体验东京年轻人文化、美食小店与潮流消费。",
+					"highlights":  []string{"年轻潮流文化", "街头小吃多", "适合轻松步行游览"},
+					"images": []map[string]any{
+						{
+							"title":      "原宿街区",
+							"url":        "https://images.unsplash.com/photo-1554797589-7241bb691973",
+							"source":     "Unsplash",
+							"source_url": "https://unsplash.com/photos/2cFZ_FB08UM",
+						},
+					},
+				},
+			},
+			"tips": []string{"涩谷建议安排到下午或傍晚", "原宿逛街建议避开周末中午高峰"},
+		},
+		{
+			"day":       3,
+			"title":     "上野与秋叶原文化收尾",
+			"route":     "上野公园 -> 东京国立博物馆 -> 阿美横町 -> 秋叶原",
+			"transport": "地铁 + 步行",
+			"summary":   "第三天以博物馆、公园和二次元电子街区作为收尾，兼具文化与购物。",
+			"attractions": []map[string]any{
+				{
+					"name":        "上野公园",
+					"description": "东京经典城市公园，周边集中了博物馆和休闲空间。",
+					"highlights":  []string{"博物馆集中", "散步舒适", "适合作为轻松安排"},
+					"images": []map[string]any{
+						{
+							"title":      "上野公园景观",
+							"url":        "https://images.unsplash.com/photo-1526481280695-3c4691f7f66c",
+							"source":     "Unsplash",
+							"source_url": "https://unsplash.com/photos/7Zjq7GxLqEc",
+						},
+					},
+				},
+				{
+					"name":        "秋叶原",
+					"description": "适合购买电子产品、动漫周边和体验东京亚文化。",
+					"highlights":  []string{"电器购物", "动漫文化", "适合夜间街景体验"},
+					"images": []map[string]any{
+						{
+							"title":      "秋叶原夜景",
+							"url":        "https://images.unsplash.com/photo-1503899036084-c55cdd92da26",
+							"source":     "Unsplash",
+							"source_url": "https://unsplash.com/photos/W7b3eDUb_2I",
+						},
+					},
+				},
+			},
+			"tips": []string{"博物馆建议提前查闭馆日", "秋叶原适合安排在傍晚以后"},
+		},
 	}
 
-	return "", fmt.Errorf("mock medical advice file not found")
+	return map[string]any{
+		"mode":            "plan",
+		"overall_summary": overallSummary,
+		"flight_price": map[string]any{
+			"summary":      "往返东京机票通常在淡季更划算，建议优先关注直飞与中转时长之间的平衡。",
+			"currency":     "CNY",
+			"price_range":  "1800-2600",
+			"booking_tips": []string{"建议提前 2 到 4 周关注价格波动", "若预算敏感，可优先考虑非黄金时段航班"},
+			"raw_text":     "Mock 航班价格区间：1800-2600 CNY，直飞更省时，中转更省预算。",
+		},
+		"daily_plans": dailyPlans,
+		"sources": []string{
+			"https://unsplash.com/photos/OQMZwNd3ThU",
+			"https://unsplash.com/photos/6I2dlBS1ewg",
+			"https://unsplash.com/photos/twukN12EN7c",
+			"https://unsplash.com/photos/JmuyB_LibRo",
+			"https://unsplash.com/photos/2cFZ_FB08UM",
+			"https://unsplash.com/photos/7Zjq7GxLqEc",
+			"https://unsplash.com/photos/W7b3eDUb_2I",
+		},
+		"notice":   "这是 mock 返回的结构化旅游方案，用于前端联调。",
+		"raw_text": "",
+	}
 }
 
 func writeSSEHeaders(w http.ResponseWriter) {

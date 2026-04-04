@@ -273,13 +273,13 @@ data: {"sessionId": "session-uuid"}
 
 ### POST `/api/v1/AI/agent/medical_advice`
 
-接口说明：根据症状描述生成医疗建议。
+接口说明：根据旅行需求生成结构化旅游方案。
 
 请求参数：
 
 | 参数 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| description | string | 是 | 症状描述 |
+| description | string | 是 | 旅行需求描述 |
 
 响应示例：
 
@@ -287,9 +287,83 @@ data: {"sessionId": "session-uuid"}
 {
   "status_code": 1000,
   "status_msg": "success",
-  "advice": "建议内容"
+  "advice": {
+    "mode": "plan",
+    "overall_summary": "整体路线、节奏与核心建议概括",
+    "flight_price": {
+      "summary": "机票价格总结",
+      "currency": "CNY",
+      "price_range": "1800-2600",
+      "booking_tips": [
+        "建议提前 2 到 4 周关注价格波动"
+      ],
+      "raw_text": "原始机票摘要"
+    },
+    "daily_plans": [
+      {
+        "day": 1,
+        "title": "浅草与东京晴空塔",
+        "route": "浅草寺 -> 仲见世商店街 -> 东京晴空塔",
+        "transport": "地铁 + 步行",
+        "summary": "当天安排概述",
+        "attractions": [
+          {
+            "name": "浅草寺",
+            "description": "景点介绍",
+            "highlights": [
+              "雷门地标",
+              "传统参道氛围"
+            ],
+            "images": [
+              {
+                "title": "浅草寺正门",
+                "url": "https://images.unsplash.com/xxx",
+                "source": "Unsplash",
+                "source_url": "https://unsplash.com/photos/xxx"
+              }
+            ]
+          }
+        ],
+        "tips": [
+          "建议上午前往"
+        ]
+      }
+    ],
+    "sources": [
+      "https://unsplash.com/photos/xxx"
+    ],
+    "notice": "",
+    "raw_text": ""
+  }
 }
 ```
+
+返回字段说明：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| mode | string | 返回模式，正常结构化结果为 `plan`，解析失败回退时可能为 `raw` |
+| overall_summary | string | 总体概括 |
+| flight_price | object | 机票价格与购票建议 |
+| daily_plans | array | 每日计划列表 |
+| daily_plans[].day | number | 第几天 |
+| daily_plans[].title | string | 当天标题 |
+| daily_plans[].route | string | 当天路线 |
+| daily_plans[].transport | string | 交通方式 |
+| daily_plans[].summary | string | 当天摘要 |
+| daily_plans[].attractions | array | 当天重点景点 |
+| daily_plans[].attractions[].name | string | 景点名称 |
+| daily_plans[].attractions[].description | string | 景点介绍 |
+| daily_plans[].attractions[].highlights | array | 景点亮点 |
+| daily_plans[].attractions[].images | array | 景点图片信息 |
+| daily_plans[].attractions[].images[].title | string | 图片标题 |
+| daily_plans[].attractions[].images[].url | string | 图片地址 |
+| daily_plans[].attractions[].images[].source | string | 图片来源名称 |
+| daily_plans[].attractions[].images[].source_url | string | 图片来源链接 |
+| daily_plans[].tips | array | 当天提示 |
+| sources | array | 来源信息与原始链接 |
+| notice | string | 附加提示，正常情况下可为空 |
+| raw_text | string | 原始文本兜底内容，正常结构化返回时通常为空 |
 
 ## 图片相关接口
 

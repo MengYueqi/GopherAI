@@ -176,6 +176,21 @@ go build -o mcp-chatbox main.go
 ./mcp-chatbox -transport=sse -server_listen=localhost:8083
 ```
 
+也可以直接一键启动全部 MCP 工具服务：
+
+```bash
+cd common/tools/mcp/eino-mcp/tools
+chmod +x start_all.sh
+./start_all.sh
+```
+
+如果需要把航班工具切到 mock 版本：
+
+```bash
+cd common/tools/mcp/eino-mcp/tools
+./start_all.sh --use-flight-mock
+```
+
 MCP 工具服务相关环境变量：
 
 - `GOOGLE_API_KEY`：Google Search 工具（`mcp-time` 内的 `google_search`）所需 API Key

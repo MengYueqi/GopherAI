@@ -13,7 +13,7 @@ go run ./test/mock
 默认启动地址：
 
 ```text
-http://127.0.0.1:8081
+http://127.0.0.1:9090
 ```
 
 如需修改端口：
@@ -279,7 +279,7 @@ Authorization: Bearer mock-jwt-token
 
 ```json
 {
-  "description": "发烧 38.5 度，伴随咳嗽和喉咙痛"
+  "description": "从上海出发，东京 3 日游，想看经典景点，预算适中"
 }
 ```
 
@@ -289,9 +289,69 @@ Authorization: Bearer mock-jwt-token
 {
   "status_code": 1000,
   "status_msg": "success",
-  "advice": "建议先充分休息并补充水分，可监测体温变化。如持续高烧、呼吸困难或症状加重，应尽快就医。"
+  "advice": {
+    "mode": "plan",
+    "overall_summary": "东京 3 日行程以经典城市地标、商业街区和文化体验为主，节奏中等，适合第一次到东京旅行的用户。",
+    "flight_price": {
+      "summary": "往返东京机票通常在淡季更划算，建议优先关注直飞与中转时长之间的平衡。",
+      "currency": "CNY",
+      "price_range": "1800-2600",
+      "booking_tips": [
+        "建议提前 2 到 4 周关注价格波动",
+        "若预算敏感，可优先考虑非黄金时段航班"
+      ],
+      "raw_text": "Mock 航班价格区间：1800-2600 CNY，直飞更省时，中转更省预算。"
+    },
+    "daily_plans": [
+      {
+        "day": 1,
+        "title": "浅草与东京晴空塔",
+        "route": "浅草寺 -> 仲见世商店街 -> 隅田公园 -> 东京晴空塔",
+        "transport": "地铁 + 步行",
+        "summary": "第一天适合从东京传统街区开始，感受寺庙文化与城市天际线。",
+        "attractions": [
+          {
+            "name": "浅草寺",
+            "description": "东京代表性的历史寺庙，适合体验传统建筑、参拜文化与街区氛围。",
+            "highlights": [
+              "雷门地标",
+              "传统参道氛围",
+              "适合拍照与体验和风街景"
+            ],
+            "images": [
+              {
+                "title": "浅草寺正门",
+                "url": "https://images.unsplash.com/photo-1542051841857-5f90071e7989",
+                "source": "Unsplash",
+                "source_url": "https://unsplash.com/photos/OQMZwNd3ThU"
+              }
+            ]
+          }
+        ],
+        "tips": [
+          "浅草区域建议上午前往，人流更可控"
+        ]
+      }
+    ],
+    "sources": [
+      "https://unsplash.com/photos/OQMZwNd3ThU",
+      "https://unsplash.com/photos/JmuyB_LibRo"
+    ],
+    "notice": "这是 mock 返回的结构化旅游方案，用于前端联调。",
+    "raw_text": ""
+  }
 }
 ```
+
+结构说明：
+
+- `advice.mode = "plan"` 表示结构化旅游方案
+- `advice.overall_summary` 用于顶部总览
+- `advice.flight_price` 用于机票价格卡片
+- `advice.daily_plans` 用于每日行程渲染
+- `advice.daily_plans[].attractions[].images` 用于图片展示
+- `advice.sources` 用于来源信息展示
+- 如果后端回退失败兜底，可返回 `mode: "raw"` 和 `raw_text`
 
 ## 流式接口 Mock
 
@@ -400,6 +460,8 @@ data: {"message":"Failed to send message"}
 - 新建会话成功
 - 已有会话继续追问
 - 聊天历史回显
+- 结构化旅游方案渲染
+- 每日景点图片展示
 - 流式输出逐段渲染
 - 流式失败提示
 - 图片上传成功和参数缺失

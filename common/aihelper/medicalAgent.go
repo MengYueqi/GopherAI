@@ -163,6 +163,65 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 		log.Printf("ERROR creating attraction planner: %v\n", err)
 		return nil, err
 	}
+	travelJSONFormatter, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
+		Name:        "TravelPlanJSONFormatter",
+		Description: "将旅行规划摘要转换为结构化 JSON",
+		Instruction: `你是旅行规划 JSON 转换助手。你会收到一份已经整理好的旅行方案摘要，请将其严格转换为一个合法 JSON 对象，不要输出 Markdown，不要输出解释，不要输出代码块。
+
+必须输出以下结构：
+{
+  "mode": "plan",
+  "overall_summary": "整体路线、节奏、适合人群与核心建议的简洁概括",
+  "flight_price": {
+    "summary": "机票价格与选择建议的总结",
+    "currency": "币种，如 CNY",
+    "price_range": "价格区间，如 1800-2600",
+    "booking_tips": ["购票建议1", "购票建议2"],
+    "raw_text": "机票规划原始摘要，尽量保留原信息"
+  },
+  "daily_plans": [
+    {
+      "day": 1,
+      "title": "当天标题",
+      "route": "当天路线顺序",
+      "transport": "主要交通方式与衔接",
+      "summary": "当天安排概述",
+      "attractions": [
+        {
+          "name": "景点名称",
+          "description": "景点介绍",
+          "highlights": ["亮点1", "亮点2"],
+          "images": [
+            {
+              "title": "图片标题或主题",
+              "url": "图片直链",
+              "source": "来源名称",
+              "source_url": "来源页面链接"
+            }
+          ]
+        }
+      ],
+      "tips": ["当天提示1", "当天提示2"]
+    }
+  ],
+  "sources": ["来源1", "来源2"],
+  "notice": "",
+  "raw_text": ""
+}
+
+约束：
+1. 所有字段都必须输出；没有信息时返回空字符串、空数组或合理默认值。
+2. daily_plans 必须是数组。
+3. 如果摘要中包含真实图片链接、来源链接或引用链接，必须原样保留，不要改写 URL。
+4. 如果某个景点没有图片，则 images 返回空数组。
+5. 如果行程按天组织，则每天都要保留当天景点及其图片信息。
+6. 只输出 JSON 对象本身。`,
+		Model: o.llm,
+	})
+	if err != nil {
+		log.Printf("ERROR creating travel json formatter: %v\n", err)
+		return nil, err
+	}
 
 	_ = g.AddLambdaNode("plan_blocked_deal", compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (res *schema.Message, err error) {
 		log.Printf("Handling plan blocked case with request: %+v\n", input)
@@ -296,6 +355,28 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	}))
 	_ = g.AddChatTemplateNode("summary_prompt", summary_pt)
 	_ = g.AddChatModelNode("summary_model", o.llm, compose.WithNodeName("ChatModel"))
+	_ = g.AddLambdaNode("travel_json_formatter", compose.InvokableLambda(func(ctx context.Context, input *schema.Message) (*schema.Message, error) {
+		runner := adk.NewRunner(ctx, adk.RunnerConfig{
+			Agent: travelJSONFormatter,
+		})
+		iter := runner.Query(ctx, input.Content)
+		var allmsg string
+		for {
+			event, ok := iter.Next()
+			if !ok {
+				break
+			}
+			if event.Err != nil {
+				return nil, event.Err
+			}
+			msg, err := event.Output.MessageOutput.GetMessage()
+			if err != nil {
+				return nil, err
+			}
+			allmsg = msg.Content
+		}
+		return &schema.Message{Content: allmsg}, nil
+	}))
 
 	// 对旅行需求进行可行性分类
 	_ = g.AddEdge(compose.START, "nodeOfPlanFeasibilityPrompt")
@@ -315,7 +396,8 @@ func (o *OpenAIModel) MedicalAgentResp(ctx context.Context, description string) 
 	_ = g.AddEdge("change_overall_output", "summary_prompt_input")
 	_ = g.AddEdge("summary_prompt_input", "summary_prompt")
 	_ = g.AddEdge("summary_prompt", "summary_model")
-	_ = g.AddEdge("summary_model", compose.END)
+	_ = g.AddEdge("summary_model", "travel_json_formatter")
+	_ = g.AddEdge("travel_json_formatter", compose.END)
 
 	r, err := g.Compile(ctx)
 	if err != nil {
